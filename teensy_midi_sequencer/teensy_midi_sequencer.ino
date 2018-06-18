@@ -41,7 +41,7 @@ void step(int current, int last);
 FifteenStep seq = FifteenStep();
 
 // save button state
-int button_last[] = {0,0,0};
+int button_last[3];
 
 //ADSR
 int attackTime;
@@ -73,7 +73,7 @@ Bounce bounce[] = {
 
 int BTNNR = 3;
 
-int button[] = {0,0,0};
+int button[3];
 
 bool isRecording = false;
 bool noteTrigFlag = false;
@@ -97,14 +97,16 @@ void setup() {
   voice1env.amplitude(0);
 
   attackTime = 50;
-  decayTime = 1000;
-  sustainLevel = 1;
-  releaseTime = 1000;
+  decayTime = 150;
+  sustainLevel = 0;
+  releaseTime = 150;
   
   // start sequencer and set callbacks
   seq.begin();
   seq.setMidiHandler(midi);
   seq.setStepHandler(step);
+  seq.setTempo(80);
+  seq.setSteps(8);
 
 }
 
@@ -113,12 +115,6 @@ void loop() {
  if(millis() > 2000){
   isRecording = true;
  }
-  
-//  
-//  // read the state of the button
- button[0] = digitalRead(2);
- button[1] = digitalRead(3);
- button[2] = digitalRead(4);
  
 // use the knobs to adjust parameters
   //float knob1 = (float)analogRead(A1) / 1023.0;
@@ -127,51 +123,73 @@ void loop() {
   float knob4 = (float)analogRead(A4) / 1023.0;
 
   for(int i = 0; i< BTNNR; i++){ 
-    if (bounce[i].fallingEdge()){
-      Serial.println("Button Press Pin:");
-      Serial.println(i);
-    }
-    if (bounce[i].risingEdge()){
-      Serial.println("Button Release Pin:");
-      Serial.println(i);
-    }
+    // read the state of the button
+    button[i] = digitalRead(i+2);
     //Serial.println("button: " + button[i]);
     if(bounce[i].update()){
+      if (bounce[i].fallingEdge()){
+        Serial.println("Button Press Pin:");
+        Serial.println(i);
+      }
+      if (bounce[i].risingEdge()){
+        Serial.println("Button Release Pin:");
+        Serial.println(i);
+      }
+  
+      Serial.println("buttonLast: ");
+      Serial.println(i);
+      Serial.println("is : ");
+      Serial.println(button_last[i]);
+      Serial.println("-----");
+      Serial.println("button: ");
+      Serial.println(i);
+      Serial.println("is : ");
+      Serial.println(button[i]);
+      
       byte midiNote;
-
-        if(i == 0) midiNote = 0x3C; //middle C
-        if(i == 1) midiNote = 0x40;
-        if(i == 2) midiNote = 0x43;
-
+  
+      if(i == 0){ 
+        midiNote = 0x3C; //middle C
+      }
+      if(i == 1){
+        midiNote = 0x40;
+      }
+      if(i == 2){
+        midiNote = 0x43;
+      }
+  
+      Serial.println("midiNote :");
+      Serial.println(midiNote);
+      
       // check for button press or release and
       // send note on or off to seqencer if needed
       if(button[i] == HIGH && button_last[i] == LOW) {
-
-        Serial.println("midiNote :" + midiNote);
-
-        // button pressed. play preview now
-        midi(0x0, 0x9, midiNote, 0x40);
-        
-        if(isRecording){
-          //seq.setNote(0x0, midiNote, 0x40);
-        }
-      } else if(button[i] == LOW && button_last[i] == HIGH) {
-
-        Serial.println("midiNoteOff :" + midiNote);
+        Serial.println("send note off");
            
         // button released. send off preview now
         midi(0x0, 0x8, midiNote, 0x0);
        
         if(isRecording){
-          //seq.setNote(0x0, midiNote, 0x0);
+          seq.setNote(0x0, midiNote, 0x0);
+        }
+        
+      } 
+      else if(button[i] == LOW && button_last[i] == HIGH) {
+        Serial.println("triggering note");
+        // button pressed. play preview now
+        midi(0x0, 0x9, midiNote, 0x40);
+        
+        if(isRecording){
+          seq.setNote(0x0, midiNote, 0x40);
         }
       }
       if(button[i] == LOW){
+  
+       Serial.println("Button low");
        if(millis() - attackWait > attackTime && noteTrigFlag){
          voice1env.amplitude(sustainLevel,decayTime);
-      }
-    }
-      
+       }
+      }     
     }
     
       
