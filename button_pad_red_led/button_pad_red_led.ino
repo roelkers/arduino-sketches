@@ -19,7 +19,7 @@ Distributed as-is; no warranty is given.
 ******************************************************************************/    
 //config variables
 #define NUM_LED_COLUMNS (4)
-#define NUM_LED_ROWS (2)
+#define NUM_LED_ROWS (4)
 #define NUM_COLORS (1)
 
 // Global variables
@@ -27,8 +27,8 @@ static bool LED_buffer[NUM_LED_COLUMNS][NUM_LED_ROWS];
 static int32_t next_advance;
 static uint8_t led_index;
 
-static const uint8_t ledcolumnpins[NUM_LED_COLUMNS]   = {2,3,4,5};
-static const uint8_t colorpins[NUM_LED_ROWS] = {33,34};
+static const uint8_t ledcolumnpins[NUM_LED_COLUMNS] = {14,15,16,17}; //42,43,44,45 //LED GND 4,3,2,1
+static const uint8_t colorpins[NUM_LED_ROWS]        = {33, 34, 35, 36}; //22,30,33,36 //Red 1,2,3,4
 
 static void setuppins()
 {
@@ -135,7 +135,14 @@ void loop()
     led_index = led_index % (NUM_LED_COLUMNS * NUM_LED_ROWS);
     LED_buffer[led_index/NUM_LED_COLUMNS][led_index%NUM_LED_COLUMNS] = true;
 
+    int row = led_index/NUM_LED_COLUMNS;
+    int column = led_index%NUM_LED_COLUMNS;
+    Serial.println("index: ");
     Serial.println(led_index);
+    Serial.println("row: ");
+    Serial.println(row);
+    Serial.println("column: ");
+    Serial.println(column);
   }
 }
 
