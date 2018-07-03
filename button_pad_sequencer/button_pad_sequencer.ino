@@ -39,6 +39,8 @@ AudioControlSGTL5000     sgtl5000_1;     //xy=558,228
 //config variables
 #define NUM_BTN_COLUMNS (4)
 #define NUM_BTN_ROWS (2)
+#define NUM_LED_COLUMNS (4)
+#define NUM_LED_ROWS (2)
 
 #define MAX_DEBOUNCE (3)
 
@@ -48,8 +50,8 @@ static bool LED_buffer[NUM_LED_COLUMNS][NUM_LED_ROWS];
 static const uint8_t btncolumnpins[NUM_BTN_COLUMNS] = {2, 3, 4, 5};
 static const uint8_t btnrowpins[NUM_BTN_ROWS]       = {6, 7};
 
-static const uint8_t ledcolumnpins[NUM_LED_COLUMNS]   = {2,3,4,5};
-static const uint8_t colorpins[NUM_LED_ROWS] = {33,34};
+static const uint8_t ledcolumnpins[NUM_LED_COLUMNS]   = {20,21,22,23};
+static const uint8_t colorpins[NUM_LED_ROWS] = {13,17};
 
 static int8_t debounce_count[NUM_BTN_COLUMNS][NUM_BTN_ROWS];
 
@@ -64,17 +66,22 @@ float notes[] = {
   513.23
   };
 
-static const bool steps[8];
-static const uint8_t sequence[8];
+static bool steps[8];
+static uint8_t sequence[8];
   
 // save button state
 uint8_t prevBtnState;
 uint8_t btnState;
 
+//Sequencer
+double stepLength; //120 BPM
+double stepWait;
+int activeStep;
+
 //ADSR
 int attackTime;
-//int decayTime;
-//float sustainLevel;
+int decayTime;
+float sustainLevel;
 int releaseTime;
 
 int attackWait;
@@ -84,6 +91,23 @@ static void setuppins()
 {
   uint8_t i;
 
+  // initialize
+  // select lines
+  for(i = 0; i < NUM_LED_COLUMNS; i++)
+  {
+      pinMode(ledcolumnpins[i], OUTPUT);
+
+      // with nothing selected by default
+      digitalWrite(ledcolumnpins[i], HIGH);
+  }
+
+  // LED drive lines
+  for(i = 0; i < NUM_LED_ROWS; i++)
+  {   
+      pinMode(colorpins[i], OUTPUT);
+      digitalWrite(colorpins[i], LOW);
+  }
+  
   // button columns
   for (i = 0; i < NUM_BTN_COLUMNS; i++)
   {
@@ -116,30 +140,44 @@ static void scan()
   uint8_t val;
   uint8_t i, j;
   int index = 0;;
+
+//  //Drive LED colorpins
+//  for(int i = 0; i < NUM_LED_COLUMNS; i++){
+//
+//    digitalWrite(ledcolumnpins[i], LOW);  
+//  
+//    for ( j = 0; j < NUM_LED_ROWS; j++)
+//    {
+//
+//    //Serial.println(LED_buffer[j][i]);
+//    
+//      if(LED_buffer[j][i])
+//      {
+//        digitalWrite(colorpins[j], HIGH);
+////        Serial.println("led driven");
+////        Serial.println("row:");
+////        Serial.println(j);
+////        Serial.println("column:");
+////        Serial.println(i);      
+//      } 
+//    }
+//  }  
   
-  for(int i = 0; i < NUM_BTN_COLUMNS; i++){
-    
+  //buttons
+  for(int i = 0; i < NUM_BTN_COLUMNS; i++){  
     // Select current columns
     digitalWrite(btncolumnpins[i], LOW);
-    digitalWrite(ledcolumnpins[current], LOW);
   
     // pause a moment
     delay(1);
-  
+    
     // Read the button inputs
     for ( j = 0; j < NUM_BTN_ROWS; j++)
     {
 	
-	  if(LED_buffer[j][i])
-	  {
-		digitalWrite(colorpins[i], HIGH);
-	  }	
-	
       index = j*NUM_BTN_COLUMNS+i;
       
       btnState = digitalRead(btnrowpins[j]);
-
-      //Serial.println(prevBtnState);
       
       if (btnState == LOW)
       {
@@ -157,9 +195,23 @@ static void scan()
             Serial.println("column:");
             Serial.println(i);            
               
-			steps[index] = !steps[index];  
-			LED_buffer[j][i] != LED_buffer[j][i];  
-            }
+      			steps[index] = !steps[index];  
+      			LED_buffer[j][i] = !LED_buffer[j][i];
+            //Serial.println("LED buffer: ");  
+            //Serial.println(LED_buffer[j][i]);
+
+            //Serial.println("LED values");
+            
+//            for(int k = 0; k < NUM_LED_COLUMNS; k++){
+//
+//              for (int m = 0; m < NUM_LED_ROWS; m++)
+//              {
+//                Serial.println(LED_buffer[k][m]);
+//              }
+//            }            
+                        
+            //read pitch value 
+            
           }
         }
       }
@@ -174,48 +226,54 @@ static void scan()
             Serial.print("Key Up ");
             Serial.println(index);
             // If you want to do something when a key is released, do it here:
-              
             
           }
         }
       }
-
-   
-        //if(millis() - attackWait[index] > attackTimeFilter && noteTrigFlag[index]){
-        //  voice1filterenv.amplitude(sustainLevelFilter,decayTimeFilter);
-        //}
-      }
-
-      prevBtnState = btnState;
   
     }// for j = 0 to 3;
 
     delay(1);
-  
+
     digitalWrite(btncolumnpins[i], HIGH);
+    digitalWrite(ledcolumnpins[i], HIGH);
+    
+    //Switch LED colorpins out
 
   }
-  digitalWrite(ledcolumnpins[current], HIGH);
+  
+//  for(int i = 0; i < NUM_BTN_COLUMNS; i++){  
+//    for (int j = 0; j < NUM_LED_ROWS; j++)
+//    {
+//       digitalWrite(colorpins[j], LOW);  
+//    }
+//  }
+    
 
 }
 
 void advanceSequencer(){
 
-	Serial.println("note triggered");
-    waveform1.frequency(notes[index]);       
-			  
-    voice1env.amplitude(1,attackTime);
-    //voice1filterenv.amplitude(1,attackTimeFilter);
-    noteTrigFlag = true;
-    attackWait = millis();  
-	
-	if(millis() - attackWait > attackTime && noteTrigFlag)	
-		noteTrigFlag = false;
-		voice1env.amplitude(0,releaseTime);
+	  if(steps[activeStep]){
+      
+  	  Serial.println("note triggered");
+      Serial.println("activeStep");
+      Serial.println(activeStep);
+      //waveform1.frequency(sequence[activeStep]);       
+      waveform1.frequency(notes[activeStep]);
+          
+      voice1env.amplitude(1,attackTime);
+      //voice1filterenv.amplitude(1,attackTimeFilter);
+      noteTrigFlag = true;
+      attackWait = millis();  
+	  }
+    else {  
+      if(noteTrigFlag){
+        voice1env.amplitude(0,releaseTime);
+        noteTrigFlag = false;
+        Serial.println("note released");
+      }
     }
-	//if(millis() - attackWait[index] > attackTimeFilter && noteTrigFlag[index]){
-    //  voice1filterenv.amplitude(sustainLevelFilter,decayTimeFilter);
-    //}
 
 }
 
@@ -234,10 +292,15 @@ void setup()
 
   voice1env.amplitude(0);
 
-  attackTime = 550;
-  //decayTime = 150;
-  //sustainLevel = 0;
+  attackTime = 50;
+  decayTime = 150;
+  sustainLevel = 0;
   releaseTime = 550;
+
+  //Sequencer
+  stepLength = 250; //BPM
+  stepWait = 0;
+  activeStep = 0;
   
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -255,5 +318,23 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   scan();
-  advanceSequencer();
+  if(millis() - stepWait > stepLength){
+    stepWait = millis();
+    if(activeStep == 7){
+      activeStep = 0;
+    }
+    else{
+      activeStep++;
+    }
+    advanceSequencer();
+  }
+
+  //check attack
+//  if(millis() - attackWait > attackTime && noteTrigFlag){
+//     voice1env.amplitude(sustainLevel,decayTime);
+//  }
+//    if(millis() - attackWait[index] > attackTimeFilter && noteTrigFlag[index]){
+//      voice1filterenv.amplitude(sustainLevelFilter,decayTimeFilter);
+//    }
+  
 }
