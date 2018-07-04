@@ -24,18 +24,15 @@ Distributed as-is; no warranty is given.
 #include <SerialFlash.h>
 
 // GUItool: begin automatically generated code
-AudioSynthWaveformDc     voice1env;            //xy=204,183
 AudioSynthWaveform       waveform1;      //xy=209,83
-AudioEffectMultiply      multiply1;      //xy=458,135
 AudioMixer4              mixer1;         //xy=760,136
 AudioOutputI2S           i2s1;           //xy=972,141
-AudioConnection          patchCord1(voice1env, 0, multiply1, 1);
-AudioConnection          patchCord2(waveform1, 0, multiply1, 0);
-AudioConnection          patchCord3(multiply1, 0, mixer1, 0);
-AudioConnection          patchCord4(mixer1, 0, i2s1, 0);
-AudioConnection          patchCord5(mixer1, 0, i2s1, 1);
+AudioConnection          patchCord1(waveform1, 0, mixer1, 0);
+AudioConnection          patchCord2(mixer1, 0, i2s1, 0);
+AudioConnection          patchCord3(mixer1, 0, i2s1, 1);
 AudioControlSGTL5000     sgtl5000_1;     //xy=558,228
 // GUItool: end automatically generated code
+
 
 //config variables
 #define NUM_BTN_COLUMNS (4)
@@ -68,7 +65,7 @@ float notes[] = {
   };
 
 static bool steps[8];
-static float sequence[8];
+static uint8_t sequence[8];
   
 // save button state
 uint8_t prevBtnState;
@@ -87,15 +84,6 @@ int releaseTime;
 
 int attackWait;
 int noteTrigFlag;
-
-int getSmooth(){
-  int vals[100]; //array that stores 5 readings.
-  for(int i = 0; i < 100; i++){
-    vals[i] = analogRead(A14); //takes 5 readings.
-  }
-  float smooth = (vals[0] + vals[1] + vals[2] + vals[3] + vals[4]) / 5;
-  return smooth;
-}
 
 static void setuppins()
 {
@@ -207,8 +195,6 @@ static void scan()
               
       			steps[index] = !steps[index];  
       			LED_buffer[j][i] = !LED_buffer[j][i];
-
-            
             //Serial.println("LED buffer: ");  
             //Serial.println(LED_buffer[j][i]);
 
@@ -223,13 +209,7 @@ static void scan()
 //            }            
                         
             //read pitch value 
-            float knob = getSmooth();
-            Serial.println(knob);
-      
-            float pitch = map(knob,1015,1023,261,513);
-            Serial.println(pitch);
-
-            sequence[index] = pitch;
+            
           }
         }
       }
@@ -270,8 +250,6 @@ static void scan()
 
 }
 
-
-
 void advanceSequencer(){
 //    Serial.println("envelope amp: ");
 //    Serial.println(voice1env.read());
@@ -281,18 +259,17 @@ void advanceSequencer(){
   	  Serial.println("note triggered");
       Serial.println("activeStep");
       Serial.println(activeStep);
-      //waveform1.frequency(sequence[activeStep]);
-             
-      waveform1.frequency(sequence[activeStep]);
-          
-      voice1env.amplitude(1,attackTime);
+      //waveform1.frequency(sequence[activeStep]);       
+      waveform1.frequency(notes[activeStep]);
+
+      mixer1.gain(0,1);
       //voice1filterenv.amplitude(1,attackTimeFilter);
       noteTrigFlag = true;
       attackWait = millis();  
 	  }
     else {  
       if(noteTrigFlag){
-        voice1env.amplitude(0,releaseTime);
+        mixer1.gain(0,0);
         noteTrigFlag = false;
         Serial.println("note released");
       }
@@ -312,8 +289,6 @@ void setup()
   waveform1.begin(WAVEFORM_SAWTOOTH);
   waveform1.amplitude(0.75);
   waveform1.frequency(50);
-
-  voice1env.amplitude(0);
 
   attackTime = 50;
   decayTime = 150;
