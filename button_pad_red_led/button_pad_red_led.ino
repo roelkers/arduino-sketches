@@ -132,6 +132,7 @@ void loop()
 
     LED_buffer[led_index%NUM_LED_COLUMNS][led_index/NUM_LED_COLUMNS] = false;
     led_index++;
+	//next line resets led_index when at end of loop
     led_index = led_index % (NUM_LED_COLUMNS * NUM_LED_ROWS);
     LED_buffer[led_index%NUM_LED_COLUMNS][led_index/NUM_LED_COLUMNS] = true;
 
