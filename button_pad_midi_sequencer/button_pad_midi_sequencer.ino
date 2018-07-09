@@ -33,26 +33,20 @@ AudioConnection          patchCord1(voice1env, 0, multiply1, 1);
 AudioConnection          patchCord2(waveform1, 0, multiply1, 0);
 AudioConnection          patchCord3(multiply1, 0, mixer1, 0);
 AudioConnection          patchCord4(mixer1, 0, i2s1, 0);
-AudioConnection          patchCord5(mixer1, 0, i2s1, 1);
 AudioControlSGTL5000     sgtl5000_1;     //xy=558,228
 // GUItool: end automatically generated code
 
 //config variables
 #define NUM_BTN_COLUMNS (4)
-#define NUM_BTN_ROWS (2)
-#define NUM_LED_COLUMNS (4)
-#define NUM_LED_ROWS (2)
+#define NUM_BTN_ROWS (4)
 
 #define MAX_DEBOUNCE (3)
 
 // Global variables
-static bool LED_buffer[NUM_LED_COLUMNS][NUM_LED_ROWS];
+//static bool LED_buffer[NUM_LED_COLUMNS][NUM_LED_ROWS];
 
 static const uint8_t btncolumnpins[NUM_BTN_COLUMNS] = {2, 3, 4, 5};
-static const uint8_t btnrowpins[NUM_BTN_ROWS]       = {6, 7};
-
-static const uint8_t ledcolumnpins[NUM_LED_COLUMNS]   = {20,21,22,23};
-static const uint8_t colorpins[NUM_LED_ROWS] = {13,17};
+static const uint8_t btnrowpins[NUM_BTN_ROWS]       = {6, 7, 8, 9;
 
 static int8_t debounce_count[NUM_BTN_COLUMNS][NUM_BTN_ROWS];
 
@@ -67,17 +61,11 @@ float notes[] = {
   513.23
   };
 
-static bool steps[8];
-static float sequence[8];
-  
 // save button state
 uint8_t prevBtnState;
 uint8_t btnState;
 
-//Sequencer
-double stepLength; //120 BPM
-double stepWait;
-int activeStep;
+uint8_t noteTrigFlag[8];
 
 //ADSR
 int attackTime;
@@ -85,39 +73,12 @@ int decayTime;
 float sustainLevel;
 int releaseTime;
 
-int attackWait;
-int noteTrigFlag;
-
-int getSmooth(){
-  int vals[100]; //array that stores 5 readings.
-  for(int i = 0; i < 100; i++){
-    vals[i] = analogRead(A14); //takes 5 readings.
-  }
-  float smooth = (vals[0] + vals[1] + vals[2] + vals[3] + vals[4]) / 5;
-  return smooth;
-}
+int attackWait[8];
 
 static void setuppins()
 {
   uint8_t i;
 
-//  // initialize
-//  // select lines
-//  for(i = 0; i < NUM_LED_COLUMNS; i++)
-//  {
-//      pinMode(ledcolumnpins[i], OUTPUT);
-//
-//      // with nothing selected by default
-//      digitalWrite(ledcolumnpins[i], HIGH);
-//  }
-//
-//  // LED drive lines
-//  for(i = 0; i < NUM_LED_ROWS; i++)
-//  {   
-//      pinMode(colorpins[i], OUTPUT);
-//      digitalWrite(colorpins[i], LOW);
-//  }
-  
   // button columns
   for (i = 0; i < NUM_BTN_COLUMNS; i++)
   {
@@ -150,44 +111,24 @@ static void scan()
   uint8_t val;
   uint8_t i, j;
   int index = 0;;
-
-//  //Drive LED colorpins
-//  for(int i = 0; i < NUM_LED_COLUMNS; i++){
-//
-//    digitalWrite(ledcolumnpins[i], LOW);  
-//  
-//    for ( j = 0; j < NUM_LED_ROWS; j++)
-//    {
-//
-//    //Serial.println(LED_buffer[j][i]);
-//    
-//      if(LED_buffer[j][i])
-//      {
-//        digitalWrite(colorpins[j], HIGH);
-////        Serial.println("led driven");
-////        Serial.println("row:");
-////        Serial.println(j);
-////        Serial.println("column:");
-////        Serial.println(i);      
-//      } 
-//    }
-//  }  
   
-  //buttons
-  for(int i = 0; i < NUM_BTN_COLUMNS; i++){  
+  for(int i = 0; i < NUM_BTN_COLUMNS; i++){
+    
     // Select current columns
     digitalWrite(btncolumnpins[i], LOW);
+    //digitalWrite(ledcolumnpins[current], LOW);
   
     // pause a moment
     delay(1);
-    
+  
     // Read the button inputs
     for ( j = 0; j < NUM_BTN_ROWS; j++)
     {
-	
       index = j*NUM_BTN_COLUMNS+i;
       
       btnState = digitalRead(btnrowpins[j]);
+
+      //Serial.println(prevBtnState);
       
       if (btnState == LOW)
       {
@@ -203,33 +144,25 @@ static void scan()
             Serial.println("row:");
             Serial.println(j);
             Serial.println("column:");
-            Serial.println(i);            
+            Serial.println(i); 
+            
+            Serial.println("btnState:");
+            Serial.println(btnState);
+            Serial.println("previous:");
+            Serial.println(prevBtnState);
+            
+            // Do whatever you want to with the button press here:
+            if (btnState == LOW && prevBtnState == HIGH){
+
+              Serial.println("note triggered");
+              waveform1.frequency(notes[index]);
               
-      			steps[index] = !steps[index];  
-      			LED_buffer[j][i] = !LED_buffer[j][i];
-
-            
-            //Serial.println("LED buffer: ");  
-            //Serial.println(LED_buffer[j][i]);
-
-            //Serial.println("LED values");
-            
-//            for(int k = 0; k < NUM_LED_COLUMNS; k++){
-//
-//              for (int m = 0; m < NUM_LED_ROWS; m++)
-//              {
-//                Serial.println(LED_buffer[k][m]);
-//              }
-//            }            
-                        
-            //read pitch value 
-            float knob = getSmooth();
-            Serial.println(knob);
-      
-            float pitch = map(knob,1015,1023,261,513);
-            Serial.println(pitch);
-
-            sequence[index] = pitch;
+              voice1env.amplitude(1,attackTime);
+              //voice1filterenv.amplitude(1,attackTimeFilter);
+              noteTrigFlag[index] = true;
+              attackWait[index] = millis();
+              
+            }
           }
         }
       }
@@ -244,59 +177,33 @@ static void scan()
             Serial.print("Key Up ");
             Serial.println(index);
             // If you want to do something when a key is released, do it here:
+              noteTrigFlag[index] = false;
+              voice1env.amplitude(0,releaseTime);
+              //voice1filterenv.amplitude(-1, releaseTimeFilter);
             
           }
         }
       }
+
+      if(btnState == LOW){
+        if(millis() - attackWait[index] > attackTime && noteTrigFlag[index]){
+         voice1env.amplitude(sustainLevel,decayTime);
+        }
+        //if(millis() - attackWait[index] > attackTimeFilter && noteTrigFlag[index]){
+        //  voice1filterenv.amplitude(sustainLevelFilter,decayTimeFilter);
+        //}
+      }
+
+      prevBtnState = btnState;
   
     }// for j = 0 to 3;
 
     delay(1);
-
+  
     digitalWrite(btncolumnpins[i], HIGH);
-    digitalWrite(ledcolumnpins[i], HIGH);
-    
-    //Switch LED colorpins out
 
   }
-  
-//  for(int i = 0; i < NUM_BTN_COLUMNS; i++){  
-//    for (int j = 0; j < NUM_LED_ROWS; j++)
-//    {
-//       digitalWrite(colorpins[j], LOW);  
-//    }
-//  }
-    
-
-}
-
-
-
-void advanceSequencer(){
-//    Serial.println("envelope amp: ");
-//    Serial.println(voice1env.read());
-    
-	  if(steps[activeStep]){
-      
-  	  Serial.println("note triggered");
-      Serial.println("activeStep");
-      Serial.println(activeStep);
-      //waveform1.frequency(sequence[activeStep]);
-             
-      waveform1.frequency(sequence[activeStep]);
-          
-      voice1env.amplitude(1,attackTime);
-      //voice1filterenv.amplitude(1,attackTimeFilter);
-      noteTrigFlag = true;
-      attackWait = millis();  
-	  }
-    else {  
-      if(noteTrigFlag){
-        voice1env.amplitude(0,releaseTime);
-        noteTrigFlag = false;
-        Serial.println("note released");
-      }
-    }
+//  digitalWrite(ledcolumnpins[current], HIGH);
 
 }
 
@@ -315,15 +222,10 @@ void setup()
 
   voice1env.amplitude(0);
 
-  attackTime = 0;
+  attackTime = 550;
   decayTime = 150;
-  sustainLevel = 1;
-  releaseTime = 0;
-
-  //Sequencer
-  stepLength = 250; //BPM
-  stepWait = 0;
-  activeStep = 0;
+  sustainLevel = 0;
+  releaseTime = 550;
   
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -341,24 +243,5 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   scan();
-  if(millis() - stepWait > stepLength){
-    stepWait = millis();
-    if(activeStep == 7){
-      activeStep = 0;
-    }
-    else{
-      activeStep++;
-    }
-    advanceSequencer();
-  }
 
-  //check attack
-  if(millis() - attackWait > attackTime && noteTrigFlag){
-     voice1env.amplitude(sustainLevel,decayTime);
-     Serial.println("attack over");
-  }
-//  if(millis() - attackWait[index] > attackTimeFilter && noteTrigFlag[index]){
-//     voice1filterenv.amplitude(sustainLevelFilter,decayTimeFilter);
-//  }
-  
 }

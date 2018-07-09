@@ -39,22 +39,20 @@ AudioControlSGTL5000     sgtl5000_1;     //xy=558,228
 
 //config variables
 #define NUM_BTN_COLUMNS (4)
-#define NUM_BTN_ROWS (2)
+#define NUM_BTN_ROWS (4)
 #define NUM_LED_COLUMNS (4)
 #define NUM_LED_ROWS (2)
 
 #define MAX_DEBOUNCE (3)
 
 // Global variables
-static bool LED_buffer_green[NUM_LED_COLUMNS][NUM_LED_ROWS];
-static bool LED_buffer_red[NUM_LED_COLUMNS][NUM_LED_ROWS];
+static bool LED_buffer[NUM_LED_COLUMNS][NUM_LED_ROWS];
 
 static const uint8_t btncolumnpins[NUM_BTN_COLUMNS] = {2, 3, 4, 5};
-static const uint8_t btnrowpins[NUM_BTN_ROWS]       = {6, 7};
+static const uint8_t btnrowpins[NUM_BTN_ROWS]       = {6, 7, 9, 10};
 
-static const uint8_t ledcolumnpins[NUM_LED_COLUMNS] = {23, 22, 21, 20}; //42,43,44,45 //LED GND 4,3,2,1
-static const uint8_t redpins[NUM_LED_ROWS]        = {17, 13}; //22,30,33,36 //Red 1,2,3,4
-static const uint8_t greenpins[NUM_LED_ROWS]        = {18, 14}; 
+//static const uint8_t ledcolumnpins[NUM_LED_COLUMNS]   = {20,21,22,23};
+//static const uint8_t colorpins[NUM_LED_ROWS] = {13,17};
 
 static int8_t debounce_count[NUM_BTN_COLUMNS][NUM_BTN_ROWS];
 
@@ -76,10 +74,13 @@ static float sequence[8];
 uint8_t prevBtnState;
 uint8_t btnState;
 
+bool keyHeldFlag = false;
+
 //Sequencer
 double stepLength; //120 BPM
 double stepWait;
 int activeStep;
+float heldNote;
 
 //ADSR
 int attackTime;
@@ -90,36 +91,9 @@ int releaseTime;
 int attackWait;
 int noteTrigFlag;
 
-int getSmooth(){
-  int vals[100]; //array that stores 5 readings.
-  for(int i = 0; i < 100; i++){
-    vals[i] = analogRead(A14); //takes 5 readings.
-  }
-  float smooth = (vals[0] + vals[1] + vals[2] + vals[3] + vals[4]) / 5;
-  return smooth;
-}
-
 static void setuppins()
 {
   uint8_t i;
-
-  // LED column lines
-  for(i = 0; i < NUM_LED_COLUMNS; i++)
-  {
-    pinMode(ledcolumnpins[i], OUTPUT);
-
-    // with nothing selected by default
-    digitalWrite(ledcolumnpins[i], HIGH);
-  }
-
-  // LED row lines
-  for(i = 0; i < NUM_LED_ROWS; i++)
-  {
-    pinMode(redpins[i], OUTPUT);
-
-    // with nothing driven by default
-    digitalWrite(redpins[i], LOW);
-  }
   
   // button columns
   for (i = 0; i < NUM_BTN_COLUMNS; i++)
@@ -147,52 +121,7 @@ static void setuppins()
 
 }
 
-static void scanLEDs()
-{
-  static uint8_t j = 0;
-  uint8_t val;
-  uint8_t i, j;
-  uint8_t index = 0; 
-  
-  // Select a column
-  digitalWrite(ledcolumnpins[j], LOW);
-
-  // write the row pins
-  for(i = 0; i < NUM_LED_ROWS; i++)
-  {
-	index = j*NUM_BTN_COLUMNS+i;
-	//check if this is the activeStep
-    if(index == activeStep){
-	  digitalWrite(redPins[i],High);
-	}
-	//otherwise check if this step has a note
-	else if(steps[index])
-    {
-      digitalWrite(greenpins[i], HIGH);
-    }
-	
-  }
-
-  delay(1);
-
-  digitalWrite(ledcolumnpins[j], HIGH);
-
-  for(i = 0; i < NUM_LED_ROWS; i++)
-  {
-    digitalWrite(redpins[i], LOW);
-	digitalWrite(greenpins[i], LOW);
-  }
-
-  // Move on to the next column
-  j++;
-  if (j >= NUM_LED_COLUMNS)
-  {
-    j = 0;
-  }
-
-}
-
-static void scanButtons()
+static void scan()
 {
   static uint8_t current = 0;
   uint8_t val;
@@ -230,30 +159,26 @@ static void scanButtons()
             Serial.println(j);
             Serial.println("column:");
             Serial.println(i);            
-              
-			steps[index] = !steps[index];  
 
-            //Serial.println("LED buffer: ");  
-            //Serial.println(LED_buffer[j][i]);
-
-            //Serial.println("LED values");
-            
-//            for(int k = 0; k < NUM_LED_COLUMNS; k++){
-//
-//              for (int m = 0; m < NUM_LED_ROWS; m++)
-//              {
-//                Serial.println(LED_buffer[k][m]);
-//              }
-//            }            
-                        
-            //read pitch value 
-            float knob = getSmooth();
-            Serial.println(knob);
-      
-            float pitch = map(knob,1015,1023,261,513);
-            Serial.println(pitch);
-
-            sequence[index] = pitch;
+            if((j == 0) || (j == 1)){
+              Serial.println("keyHeldFlag");
+              Serial.println(keyHeldFlag);
+              if(keyHeldFlag){
+                //sequencer input
+                steps[index] = !steps[index];  
+                LED_buffer[j][i] = !LED_buffer[j][i];
+                sequence[index] = heldNote;
+                Serial.println("sequencer input");
+                Serial.println(heldNote);
+              }
+            }
+            else {
+              //note input 
+              keyHeldFlag = true;
+              heldNote = notes[index-8];
+              Serial.println("Note held");
+              Serial.println(heldNote);
+            }
           }
         }
       }
@@ -265,10 +190,10 @@ static void scanButtons()
           debounce_count[i][j]--;
           if ( debounce_count[i][j] == 0 )
           {
-            Serial.print("Key Up ");
+            Serial.print("Key Up , stopped holding note.");
             Serial.println(index);
             // If you want to do something when a key is released, do it here:
-            
+            keyHeldFlag = false;
           }
         }
       }
@@ -278,10 +203,14 @@ static void scanButtons()
     delay(1);
 
     digitalWrite(btncolumnpins[i], HIGH);
+    
+    //Switch LED colorpins out
 
   }
 
 }
+
+
 
 void advanceSequencer(){
 //    Serial.println("envelope amp: ");
@@ -293,6 +222,8 @@ void advanceSequencer(){
       Serial.println("activeStep");
       Serial.println(activeStep);
       //waveform1.frequency(sequence[activeStep]);
+      Serial.println("freq");
+      Serial.println(sequence[activeStep]);
              
       waveform1.frequency(sequence[activeStep]);
           
@@ -305,7 +236,6 @@ void advanceSequencer(){
       if(noteTrigFlag){
         voice1env.amplitude(0,releaseTime);
         noteTrigFlag = false;
-        Serial.println("note released");
       }
     }
 
@@ -326,7 +256,7 @@ void setup()
 
   voice1env.amplitude(0);
 
-  attackTime = 50;
+  attackTime = 150;
   decayTime = 150;
   sustainLevel = 0;
   releaseTime = 550;
@@ -350,9 +280,8 @@ void setup()
 
 void loop() {
   // put your main code here, to run repeatedly:
-  
-  scanLEDs();
-  scanButtons();
+
+  scan();
   if(millis() - stepWait > stepLength){
     stepWait = millis();
     if(activeStep == 7){
@@ -368,8 +297,8 @@ void loop() {
 //  if(millis() - attackWait > attackTime && noteTrigFlag){
 //     voice1env.amplitude(sustainLevel,decayTime);
 //  }
-//    if(millis() - attackWait[index] > attackTimeFilter && noteTrigFlag[index]){
-//      voice1filterenv.amplitude(sustainLevelFilter,decayTimeFilter);
-//    }
+//  if(millis() - attackWait[index] > attackTimeFilter && noteTrigFlag[index]){
+//     voice1filterenv.amplitude(sustainLevelFilter,decayTimeFilter);
+//  }
   
 }

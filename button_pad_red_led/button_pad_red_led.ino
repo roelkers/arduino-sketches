@@ -82,7 +82,7 @@ static void scan()
   {
     digitalWrite(colorpins[i], LOW);
   }
-
+  Serial.println(current);
   // Move on to the next column
   current++;
   if (current >= NUM_LED_COLUMNS)
@@ -132,7 +132,6 @@ void loop()
 
     LED_buffer[led_index%NUM_LED_COLUMNS][led_index/NUM_LED_COLUMNS] = false;
     led_index++;
-	//next line resets led_index when at end of loop
     led_index = led_index % (NUM_LED_COLUMNS * NUM_LED_ROWS);
     LED_buffer[led_index%NUM_LED_COLUMNS][led_index/NUM_LED_COLUMNS] = true;
 
