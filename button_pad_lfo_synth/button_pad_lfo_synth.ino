@@ -23,12 +23,6 @@ Distributed as-is; no warranty is given.
 #include <SD.h>
 #include <SerialFlash.h>
 
-#include <Audio.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <SD.h>
-#include <SerialFlash.h>
-
 // GUItool: begin automatically generated code
 AudioSynthWaveform       lfo;            //xy=677.4761581420898,1172.523769378662
 AudioAnalyzePeak         peak1;          //xy=949.0476112365723,890.8095207214355
@@ -95,6 +89,13 @@ int vcoTwoOct;
 //LFO
 float tempDetuneMod;
 float tempPeak;
+float deTune;
+float deTuneLfo;
+float lfoFrequency;
+
+float mapfloat(float x, float in_min, float in_max, float out_min, float out_max){
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 
 static void setuppins()
 {
@@ -176,9 +177,18 @@ static void scan()
             if (btnState == LOW && prevBtnState == HIGH){
 
               Serial.println("note triggered");
-			  
-              waveform1.frequency((noteFreq[keyIndex][i]/4)*vcoOneOct);
-			  waveform2.frequency(((noteFreq[keyIndex][i]/4*vcoTwoOct) * deTune) * deTuneLfo);
+              Serial.println("deTuneLfo");
+              Serial.println(deTuneLfo);
+        
+              Serial.println("lfoFrequency");
+              Serial.println(lfoFrequency);
+
+              Serial.println("tempDetuneMod");
+              Serial.println(tempDetuneMod);
+        
+              
+              waveform1.frequency((notes[index]/4)*vcoOneOct);
+			        waveform2.frequency((((notes[index]/4)*vcoTwoOct) * deTune) * deTuneLfo);
 			  
               voice1env.amplitude(1,attackTime);
               //voice1filterenv.amplitude(1,attackTimeFilter);
@@ -254,7 +264,7 @@ void setup()
   
   attackTime = 550;
   decayTime = 150;
-  sustainLevel = 0;
+  sustainLevel = 1;
   releaseTime = 550;
   
   vcoOneOct = 1;
@@ -264,6 +274,7 @@ void setup()
   lfo.begin(1,3,WAVEFORM_SINE);
   deTuneLfo = 1;
   deTune = 1;
+  lfoFrequency = 1;
   
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -281,18 +292,23 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   scan();
-
-  deTune = analogRead(%%%%);
-  deTune = mapfloat(deTune, 0, 1023, .875, 1.125);
+//
+//  deTune = analogRead(A17);
+//  deTune = mapfloat(deTune, 0, 1023, .875, 1.125);
   
   //lfo
-  /*
-  lfo.frequency(analogRead($$$$)/50);
-  tempDetuneMod = analogRead($$$$)/2046;
+ 
+  lfoFrequency = analogRead(A17)/50;
+  lfo.frequency(lfoFrequency);
+  tempDetuneMod = analogRead(A14)/2046;
   if(peak1.available()){
     tempPeak = peak1.read();
+    //Serial.println("tempPeak");
+    //Serial.println(tempPeak);
   }
   deTuneLfo = ((tempPeak) * tempDetuneMod + 1);
    //Serial.println(deTuneLfo);
-  }
-  */
+}
+  
+
+
