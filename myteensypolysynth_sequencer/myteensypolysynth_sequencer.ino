@@ -184,7 +184,7 @@ AudioControlSGTL5000     sgtl5000_1;     //xy=2378,971
 #define MAX_DEBOUNCE (3)
 
 static const uint8_t btncolumnpins[NUM_BTN_COLUMNS] = {2, 3, 4, 5};
-static const uint8_t btnrowpins[NUM_BTN_ROWS]       = {6, 7, 31, 32};
+static const uint8_t btnrowpins[NUM_BTN_ROWS]       = {6, 7, 31,32};
 
 static int8_t debounce_count[NUM_BTN_COLUMNS][NUM_BTN_ROWS];
 
@@ -202,8 +202,10 @@ float noteFreq[7][8] = {
   {587.33,392.00,659.25,440.00,739.99,493.88,783.99,523.25},
 };
 
-int btnState[8];
-int prevBtnState[8];
+int steps[8][8];
+
+int btnState[16];
+int prevBtnState[16];
 
 
 //Analog Inputs
@@ -278,7 +280,11 @@ unsigned long attackWait[8];
 
 bool firstRunRead;
 
-
+//Sequencer
+double stepLength; //120 BPM
+double stepWait;
+int activeStep;
+float buttonHeld[8];
 
 
 void setup() {
@@ -412,15 +418,20 @@ void setup() {
   lfoenvelope.amplitude(1);
   voiceBPulse = false;
 
-  attackTimeFilter = 250;
-  decayTimeFilter = 250;
+  attackTimeFilter = 0;
+  decayTimeFilter = 0;
   sustainLevelFilter = 1;
   releaseTimeFilter = 500;
 
-  attackTime = 250;
+  attackTime = 0;
   decayTime = 250;
   sustainLevel= 1;
   releaseTime= 500;
+
+  //Sequencer
+  stepLength = 250; //BPM
+  stepWait = 0;
+  activeStep = 0;
 
   firstRunRead = true;
 
@@ -475,8 +486,8 @@ int getSmooth(int pin){
 }
 
 void buttonUpdate(int i){
-  Serial.println("buttonUpdate:");
-  Serial.println(i);
+//  Serial.println("buttonUpdate:");
+//  Serial.println(i);
       if(i == 0){
         if (btnState[i] == LOW && prevBtnState[i] == HIGH){
           voice1env.amplitude(1,attackTime);
@@ -500,7 +511,6 @@ void buttonUpdate(int i){
           noteTrigFlag[i] = false;
           voice2env.amplitude(0,releaseTime);
           voice2filterenv.amplitude(-1, releaseTimeFilter);
-          Serial.println("button released");
         }
       }
       if(i == 2){
@@ -623,9 +633,31 @@ static void scan()
 //            Serial.println("previous:");
 //            Serial.println(prevBtnState);
 
-            btnState[index] = LOW;
+            if(j == 0 || j == 1){
+              for(int k = 0; k< 8; k++){
+                Serial.println(buttonHeld[k]);
+                if(buttonHeld[k]){
+                  Serial.println("sequencer input");
+                  Serial.println("button");
+                  Serial.println(k);
+                  Serial.println("at step");
+                  Serial.println(index);
+                  steps[index][k] = 1; 
+                }
+              }
+            }
+            else{
+              index = index%8;
+              Serial.println("note triggered");
+              Serial.println(index);
+              buttonHeld[index]= 1;  
+              
+              btnState[index] = LOW;
+            
+              buttonUpdate(index);
 
-            buttonUpdate(index);
+            
+            }
           }
         }
       }
@@ -643,10 +675,19 @@ static void scan()
             Serial.println(j);
             Serial.println("column:");
             Serial.println(i); 
-            
-            btnState[index] = HIGH;
 
-            buttonUpdate(index); 
+            if(j== 2 || j == 3){
+              index = index%8;
+              
+              Serial.println("note released");
+              Serial.println(index);
+              
+              buttonHeld[index] = 0;
+              
+              btnState[index] = HIGH;
+
+              buttonUpdate(index);
+            }
           }
         }
       } 
@@ -658,6 +699,29 @@ static void scan()
 
   }
 }  
+
+void advanceSequencer(){
+
+  for(int index = 0; index< 8; index++){ 
+    if(steps[activeStep][index]){
+      
+      Serial.println("note triggered");
+      Serial.println("activeStep");
+      Serial.println(activeStep);
+
+      //set prevBtnState to high to always retrig envelopes
+      prevBtnState[index] = HIGH;
+      btnState[index] = LOW;
+      buttonUpdate(index);
+                
+    }
+    else {  
+
+      btnState[index] = HIGH;
+      buttonUpdate(index);
+    }
+  }
+}
 
 void loop() {
 
@@ -785,6 +849,17 @@ void loop() {
 //    //Serial.println(deTuneLfo);
 //  }
   firstRunRead = false;
+
+  if(millis() - stepWait > stepLength){
+    stepWait = millis();
+    if(activeStep == 7){
+      activeStep = 0;
+    }
+    else{
+      activeStep++;
+    }
+    advanceSequencer();
+  }
 }
 
 

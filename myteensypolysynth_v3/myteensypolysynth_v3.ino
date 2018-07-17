@@ -184,7 +184,7 @@ AudioControlSGTL5000     sgtl5000_1;     //xy=2378,971
 #define MAX_DEBOUNCE (3)
 
 static const uint8_t btncolumnpins[NUM_BTN_COLUMNS] = {2, 3, 4, 5};
-static const uint8_t btnrowpins[NUM_BTN_ROWS]       = {6, 7, 31, 32};
+static const uint8_t btnrowpins[NUM_BTN_ROWS]       = {6, 7, 9, 10};
 
 static int8_t debounce_count[NUM_BTN_COLUMNS][NUM_BTN_ROWS];
 
@@ -205,6 +205,7 @@ float noteFreq[7][8] = {
 int btnState[8];
 int prevBtnState[8];
 
+int steps[8][8];
 
 //Analog Inputs
 float analogValues[16];
@@ -426,6 +427,7 @@ void setup() {
 
   tempDetuneMod = 0.25;
   
+
 
 //  pinMode(A18, INPUT);
 //  pinMode(A19, INPUT);

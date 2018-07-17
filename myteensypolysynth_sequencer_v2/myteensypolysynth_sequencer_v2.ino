@@ -175,8 +175,6 @@ AudioConnection          patchCord87(mainOutMixer, 0, i2s1, 1);
 AudioControlSGTL5000     sgtl5000_1;     //xy=2378,971
 // GUItool: end automatically generated code
 
-
-
 //config variables
 #define NUM_BTN_COLUMNS (4)
 #define NUM_BTN_ROWS (4)
@@ -184,7 +182,7 @@ AudioControlSGTL5000     sgtl5000_1;     //xy=2378,971
 #define MAX_DEBOUNCE (3)
 
 static const uint8_t btncolumnpins[NUM_BTN_COLUMNS] = {2, 3, 4, 5};
-static const uint8_t btnrowpins[NUM_BTN_ROWS]       = {6, 7, 31, 32};
+static const uint8_t btnrowpins[NUM_BTN_ROWS]       = {6, 7, 9, 10};
 
 static int8_t debounce_count[NUM_BTN_COLUMNS][NUM_BTN_ROWS];
 
@@ -201,6 +199,8 @@ float noteFreq[7][8] = {
   {523.25,349.23,587.33,392.00,659.25,440.00,698.46,466.16},
   {587.33,392.00,659.25,440.00,739.99,493.88,783.99,523.25},
 };
+
+int steps[8][8];
 
 int btnState[8];
 int prevBtnState[8];
@@ -278,7 +278,11 @@ unsigned long attackWait[8];
 
 bool firstRunRead;
 
-
+//Sequencer
+double stepLength; //120 BPM
+double stepWait;
+int activeStep;
+float buttonHeld[8];
 
 
 void setup() {
@@ -422,6 +426,11 @@ void setup() {
   sustainLevel= 1;
   releaseTime= 500;
 
+  //Sequencer
+  stepLength = 1000; //BPM
+  stepWait = 0;
+  activeStep = 0;
+
   firstRunRead = true;
 
   tempDetuneMod = 0.25;
@@ -500,7 +509,6 @@ void buttonUpdate(int i){
           noteTrigFlag[i] = false;
           voice2env.amplitude(0,releaseTime);
           voice2filterenv.amplitude(-1, releaseTimeFilter);
-          Serial.println("button released");
         }
       }
       if(i == 2){
@@ -618,14 +626,11 @@ static void scan()
             Serial.println("column:");
             Serial.println(i); 
             
-//            Serial.println("btnState:");
-//            Serial.println(btnState);
-//            Serial.println("previous:");
-//            Serial.println(prevBtnState);
-
             btnState[index] = LOW;
 
             buttonUpdate(index);
+            
+            
           }
         }
       }
@@ -643,7 +648,6 @@ static void scan()
             Serial.println(j);
             Serial.println("column:");
             Serial.println(i); 
-            
             btnState[index] = HIGH;
 
             buttonUpdate(index); 
@@ -658,6 +662,28 @@ static void scan()
 
   }
 }  
+
+void advanceSequencer(){
+
+  for(int index = 0; index< 8; index++){ 
+    if(steps[activeStep][index]){
+      
+      Serial.println("note triggered");
+      Serial.println("activeStep");
+      Serial.println(activeStep);
+      Serial.println("freq");
+
+      btnState[index] = LOW;
+      buttonUpdate(index);
+                
+    }
+    else {  
+
+      btnState[index] = HIGH;
+      buttonUpdate(index);
+    }
+  }
+}
 
 void loop() {
 
@@ -785,6 +811,17 @@ void loop() {
 //    //Serial.println(deTuneLfo);
 //  }
   firstRunRead = false;
+
+//  if(millis() - stepWait > stepLength){
+//    stepWait = millis();
+//    if(activeStep == 7){
+//      activeStep = 0;
+//    }
+//    else{
+//      activeStep++;
+//    }
+//    //advanceSequencer();
+//  }
 }
 
 
