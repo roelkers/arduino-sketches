@@ -83,7 +83,7 @@ void setup() {
   sgtl5000_1.enable();
   sgtl5000_1.volume(0.5);
   waveform1.begin(1.0, 400.0, WAVEFORM_SINE);
-  waveshape1.shape(WAVESHAPE_ATAN, 17);
+  waveshape1.shape(WAVESHAPE_CUBIC, 17);
 }
 
 float getSmooth(){
@@ -98,21 +98,18 @@ float getSmooth(){
 void loop() {
   float WAVESHAPE_NEW[17];
 
+
   if(millis() > nextRead){
-    Serial.println("nextRead");
-    
-    nextRead = millis() + 3000;
-    
-    float knob = getSmooth();
-    
-    float distort_exponent = map(knob,1015,1023,0,1);
-    
-    Serial.println(distort_exponent);    
-    for(int i = 0; i < 18; i++){
-      WAVESHAPE_NEW[i] = pow(WAVESHAPE_INPUT[i],distort_exponent);
-    }
+
+   nextRead = millis() + 3000;
+
+   float amplitude = getSmooth()/1023;
+
+   Serial.println("amplitude");
+   Serial.println(amplitude);
+
+   waveform1.amplitude(amplitude);
+
   
-    waveshape1.shape(WAVESHAPE_NEW,17);
-  
-  }
+ }
 }

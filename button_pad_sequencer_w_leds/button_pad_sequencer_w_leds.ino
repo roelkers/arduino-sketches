@@ -52,9 +52,9 @@ static bool LED_buffer_red[NUM_LED_COLUMNS][NUM_LED_ROWS];
 static const uint8_t btncolumnpins[NUM_BTN_COLUMNS] = {2, 3, 4, 5};
 static const uint8_t btnrowpins[NUM_BTN_ROWS]       = {6, 7};
 
-static const uint8_t ledcolumnpins[NUM_LED_COLUMNS] = {23, 22, 21, 20}; //42,43,44,45 //LED GND 4,3,2,1
-static const uint8_t redpins[NUM_LED_ROWS]        = {17, 13}; //22,30,33,36 //Red 1,2,3,4
-static const uint8_t greenpins[NUM_LED_ROWS]        = {14, 15}; 
+static const uint8_t ledcolumnpins[NUM_LED_COLUMNS] = {19, 22, 21, 20}; //42,43,44,45 //LED GND 4,3,2,1
+static const uint8_t redpins[NUM_LED_ROWS]        = {17, 16}; //22,30,33,36 //Red 1,2,3,4
+static const uint8_t greenpins[NUM_LED_ROWS]        = {15, 14}; 
 
 static int8_t debounce_count[NUM_BTN_COLUMNS][NUM_BTN_ROWS];
 
@@ -112,13 +112,23 @@ static void setuppins()
     digitalWrite(ledcolumnpins[i], HIGH);
   }
 
-  // LED row lines
+  // LED red row lines
   for(i = 0; i < NUM_LED_ROWS; i++)
   {
     pinMode(redpins[i], OUTPUT);
 
     // with nothing driven by default
     digitalWrite(redpins[i], LOW);
+  }
+
+  
+  // LED green row lines
+  for(i = 0; i < NUM_LED_ROWS; i++)
+  {
+    pinMode(greenpins[i], OUTPUT);
+
+    // with nothing driven by default
+    digitalWrite(greenpins[i], LOW);
   }
   
   // button columns
@@ -152,34 +162,38 @@ static void scanLEDs()
 
   uint8_t val;
   uint8_t i;
-  static uint8_t j;
+  static uint8_t current;
   uint8_t index = 0; 
   
   // Select a column
-  digitalWrite(ledcolumnpins[j], LOW);
+  digitalWrite(ledcolumnpins[current], LOW);
 
   // write the row pins
   for(i = 0; i < NUM_LED_ROWS; i++)
   {
-	index = i*NUM_BTN_COLUMNS+j;
+	index = i*NUM_BTN_COLUMNS+current;
 	//check if this is the activeStep
   if(index == activeStep){
 
 	  digitalWrite(redpins[i],HIGH);
-	}
+//    if(activeStep != 0){
+//      Serial.println("active step");
+//      Serial.println(index);
+//    }
+  }
 	//otherwise check if this step has a note
 	else if(steps[index] == 1)
     {
-      Serial.println("step marked");
-      Serial.print(index);
-      Serial.println(i);
+//      Serial.println("mark step");
+//      Serial.println(index);
+//      Serial.println(i);
       digitalWrite(greenpins[i], HIGH);
     }
   }
 
   delay(1);
 
-  digitalWrite(ledcolumnpins[j], HIGH);
+  digitalWrite(ledcolumnpins[current], HIGH);
 
   for(i = 0; i < NUM_LED_ROWS; i++)
   {
@@ -188,10 +202,10 @@ static void scanLEDs()
   }
 
   // Move on to the next column
-  j++;
-  if (j >= NUM_LED_COLUMNS)
+  current++;
+  if (current >= NUM_LED_COLUMNS)
   {
-    j = 0;
+    current = 0;
   }
 
 }
@@ -343,11 +357,21 @@ void setup()
 
   Serial.print("Starting Setup...");
 
+  steps[0] = 400;
+  steps[1] = 100;
+  steps[2] = 222;
+  steps[3] = 300;
+  steps[4] = 100;
+  steps[5] = 1000;
+  steps[6] = 100;
+  steps[7] = 300;
+
   // setup hardware
   setuppins();
 
   Serial.println("Setup Complete.");
 
+  
 }
 
 void loop() {
@@ -363,8 +387,11 @@ void loop() {
     }
     else{
       activeStep++;
+//      Serial.println("activeStep");
+//      Serial.println(activeStep);
     }
     advanceSequencer();
+
   }
 
   //check attack

@@ -19,7 +19,7 @@ Distributed as-is; no warranty is given.
 ******************************************************************************/    
 //config variables
 #define NUM_LED_COLUMNS (4)
-#define NUM_LED_ROWS (2)
+#define NUM_LED_ROWS (4)
 #define NUM_COLORS (1)
 
 // Global variables
@@ -28,7 +28,7 @@ static int32_t next_advance;
 static uint8_t led_index;
 
 static const uint8_t ledcolumnpins[NUM_LED_COLUMNS] = {23, 22, 21, 20}; //42,43,44,45 //LED GND 4,3,2,1
-static const uint8_t colorpins[NUM_LED_ROWS]        = {17, 13}; //22,30,33,36 //Red 1,2,3,4
+static const uint8_t colorpins[NUM_LED_ROWS]        = {17, 16, 15, 14}; //22,30,33,36 //Red 1,2,3,4
 
 static void setuppins()
 {

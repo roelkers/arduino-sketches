@@ -192,8 +192,6 @@ AudioControlSGTL5000     sgtl5000_1;     //xy=2465.2899780273437,1055.1499862670
 // GUItool: end automatically generated code
 
 
-
-
 //config variables
 #define NUM_BTN_COLUMNS (4)
 #define NUM_BTN_ROWS (4)
@@ -333,28 +331,28 @@ void setup() {
 
   //Voice 1
   voice1a.begin(.3,440,WAVEFORM_SQUARE);
-  voice1b.begin(.3,440,WAVEFORM_SAWTOOTH);
+  voice1b.begin(.3,440,WAVEFORM_SQUARE);
   //Voice 2
   voice2a.begin(.3,440,WAVEFORM_SQUARE);
-  voice2b.begin(.3,440,WAVEFORM_SAWTOOTH);
+  voice2b.begin(.3,440,WAVEFORM_SQUARE);
   //Voice 3
   voice3a.begin(.3,440,WAVEFORM_SQUARE);
-  voice3b.begin(.3,440,WAVEFORM_SAWTOOTH);
+  voice3b.begin(.3,440,WAVEFORM_SQUARE);
   //Voice 4
   voice4a.begin(.3,440,WAVEFORM_SQUARE);
-  voice4b.begin(.3,440,WAVEFORM_SAWTOOTH);
+  voice4b.begin(.3,440,WAVEFORM_SQUARE);
   //Voice 5
   voice5a.begin(.3,440,WAVEFORM_SQUARE);
-  voice5b.begin(.3,440,WAVEFORM_SAWTOOTH);
+  voice5b.begin(.3,440,WAVEFORM_SQUARE);
   //Voice 6
   voice6a.begin(.3,440,WAVEFORM_SQUARE);
-  voice6b.begin(.3,440,WAVEFORM_SAWTOOTH);
+  voice6b.begin(.3,440,WAVEFORM_SQUARE);
   //Voice 7
   voice7a.begin(.3,440,WAVEFORM_SQUARE);
-  voice7b.begin(.3,440,WAVEFORM_SAWTOOTH);
+  voice7b.begin(.3,440,WAVEFORM_SQUARE);
   //Voice 8
   voice8a.begin(.3,440,WAVEFORM_SQUARE);
-  voice8b.begin(.3,440,WAVEFORM_SAWTOOTH);
+  voice8b.begin(.3,440,WAVEFORM_SQUARE);
 
   float noiseAmplitude = 0;
   
@@ -420,8 +418,8 @@ void setup() {
   voice7filtermodmixer.gain(0, envModFilter);
   voice8filtermodmixer.gain(0, envModFilter);
 
-  vcoOneLevel = 0.5;
-  vcoTwoLevel = 0.5;
+  vcoOneLevel = 0;
+  vcoTwoLevel = 1;
   voice1mix.gain(1,vcoOneLevel);
   voice1mix.gain(0,vcoTwoLevel);
   voice2mix.gain(1,vcoOneLevel);
@@ -448,19 +446,20 @@ void setup() {
   vcoOneOct = 1;
   vcoTwoOct = 1;
   deTune = 1;
-
+  deTuneLfo = 1;
+  
   lfoenvelope.amplitude(1);
-  voiceBPulse = false;
+  voiceBPulse = true;
 
   attackTimeFilter = 0;
   decayTimeFilter = 0;
-  sustainLevelFilter = 1;
+  sustainLevelFilter = 0.5;
   releaseTimeFilter = 500;
 
   attackTime = 0;
   decayTime = 250;
   sustainLevel= 1;
-  releaseTime= 500;
+  releaseTime= 0;
 
   //Sequencer
   stepLength = 250; //BPM
@@ -470,7 +469,6 @@ void setup() {
   firstRunRead = true;
 
   tempDetuneMod = 0.25;
-  
 
 //  pinMode(A18, INPUT);
 //  pinMode(A19, INPUT);
@@ -554,6 +552,7 @@ void buttonUpdate(int i){
           noteTrigFlag[i] = true;
           attackWait[i] = millis();
         }else{
+          Serial.println("release");
           noteTrigFlag[i] = false;
           voice3env.amplitude(0,releaseTime);
           voice3filterenv.amplitude(-1, releaseTimeFilter);
@@ -737,22 +736,22 @@ static void scan()
 void advanceSequencer(){
 
   for(int index = 0; index< 8; index++){ 
-    if(steps[activeStep][index]){
+    if(!buttonHeld[index]){
+      if(steps[activeStep][index]){
       
-      Serial.println("note triggered");
-      Serial.println("activeStep");
-      Serial.println(activeStep);
-
-      //set prevBtnState to high to always retrig envelopes
-      prevBtnState[index] = HIGH;
-      btnState[index] = LOW;
-      buttonUpdate(index);
-                
-    }
-    else {  
-
-      btnState[index] = HIGH;
-      buttonUpdate(index);
+        Serial.println("note triggered");
+        Serial.println("activeStep");
+        Serial.println(activeStep);
+          //set prevBtnState to high to always retrig envelopes
+          prevBtnState[index] = HIGH;
+          btnState[index] = LOW;
+          buttonUpdate(index);
+                  
+      }
+      else {  
+            btnState[index] = HIGH;
+            buttonUpdate(index);
+      }
     }
   }
 }
@@ -871,17 +870,283 @@ void loop() {
       } 
     }
     prevBtnState[i] = btnState[i];
+    if(i==2){
+      Serial.println("prevBtnState");
+      Serial.println(prevBtnState[i]);
+      Serial.println("btnState");
+      Serial.println(btnState[i]);
+      
+    }
   }
 
-//  //LFO Peak
-//  if(peak1.available()){
-//    tempPeak = peak1.read();
+  //knobs
+  analogValues[0] = getSmooth(A14);
+  analogValues[1] = getSmooth(A15);
+  
+  for(int i = 0; i < 2; i ++){
+
+    if(i == 8 || i == 2){
+      changeThresh = 250;
+    }else if(i == 14)
+      changeThresh = 200;
+    else{
+      changeThresh = 5;
+    }
+    if (abs(analogValues[i] - analogValuesLag[i]) > changeThresh || firstRunRead){
+      //vcoOne
+      if(i == 4){
+        //oct
+        octOneIndex = (analogValues[i]/204)+1;
+        if(octOneIndex < 6){
+          vcoOneOct = octArray[octOneIndex];
+        }
+      }
+      if(i == 8){
+        //shape
+        waveShapeOneIndex = analogValues[i]/255;
+        if(waveShapeOneIndex < 4){
+          voice1a.begin(waveShapes[waveShapeOneIndex]);
+          voice2a.begin(waveShapes[waveShapeOneIndex]);
+          voice3a.begin(waveShapes[waveShapeOneIndex]);
+          voice4a.begin(waveShapes[waveShapeOneIndex]);
+          voice5a.begin(waveShapes[waveShapeOneIndex]);
+          voice6a.begin(waveShapes[waveShapeOneIndex]);
+          voice7a.begin(waveShapes[waveShapeOneIndex]);
+          voice8a.begin(waveShapes[waveShapeOneIndex]);
+        }
+      }
+      if(i == 0){
+        //mix
+        vcoOneLevel = (analogValues[i])/1023;
+        vcoTwoLevel = 1 - (analogValues[i])/1023;
+        voice1mix.gain(1,vcoOneLevel);
+        voice1mix.gain(0,vcoTwoLevel);
+        voice2mix.gain(1,vcoOneLevel);
+        voice2mix.gain(0,vcoTwoLevel);
+        voice3mix.gain(1,vcoOneLevel);
+        voice3mix.gain(0,vcoTwoLevel);  
+        voice4mix.gain(1,vcoOneLevel); 
+        voice4mix.gain(0,vcoTwoLevel); 
+        voice5mix.gain(1,vcoOneLevel); 
+        voice5mix.gain(0,vcoTwoLevel); 
+        voice6mix.gain(1,vcoOneLevel); 
+        voice6mix.gain(0,vcoTwoLevel); 
+        voice7mix.gain(1,vcoOneLevel); 
+        voice7mix.gain(0,vcoTwoLevel); 
+        voice8mix.gain(1,vcoOneLevel); 
+        voice8mix.gain(0,vcoTwoLevel); 
+      }
+      //vcoTwo
+      if(i == 10){
+        //oct
+        octTwoIndex = (analogValues[i]/204)+1;
+        if(octTwoIndex < 6){
+          vcoTwoOct = octArray[octTwoIndex];
+        }
+
+      }
+      if(i == 9){
+        //shape
+        waveShapeTwoIndex = analogValues[i]/255;
+        if(waveShapeTwoIndex < 4){
+          if(waveShapeTwoIndex == 3){
+            voiceBPulse = true;
+          }else{
+            voiceBPulse = false;
+          }          
+          voice1b.begin(waveShapes[waveShapeTwoIndex]);
+          voice2b.begin(waveShapes[waveShapeTwoIndex]);
+          voice3b.begin(waveShapes[waveShapeTwoIndex]);
+          voice4b.begin(waveShapes[waveShapeTwoIndex]);
+          voice5b.begin(waveShapes[waveShapeTwoIndex]);
+          voice6b.begin(waveShapes[waveShapeTwoIndex]);
+          voice7b.begin(waveShapes[waveShapeTwoIndex]);
+          voice8b.begin(waveShapes[waveShapeTwoIndex]);
+        }
+      }
+      if(i == 2){
+        //detune
+        deTune = analogValues[i];
+        deTune = mapfloat(deTune, 0, 1023, .875, 1.125);
+      }
+      //LFO
+      if(i == 7){
+        //freq
+        lfo.frequency(analogValues[i]/50);
+      }
+      if(i == 14){
+        //shape
+        lfoWaveShapeIndex = analogValues[i]/204.6;
+        if(lfoWaveShapeIndex < 5){
+          lfo.begin(lfoWaveShapes[lfoWaveShapeIndex]);
+          Serial.println(lfoWaveShapeIndex);
+        }
+      }
+      //noise
+      if(i == 5){
+        voice1n.amplitude(analogValues[i]/3096);
+        voice2n.amplitude(analogValues[i]/3096);
+        voice3n.amplitude(analogValues[i]/3096);
+        voice4n.amplitude(analogValues[i]/3096);
+        voice5n.amplitude(analogValues[i]/3096);
+        voice6n.amplitude(analogValues[i]/3096);
+        voice7n.amplitude(analogValues[i]/3096);
+        voice8n.amplitude(analogValues[i]/3096);
+      }
+      //Filter
+      if(i == 3){
+        //frequency
+        voice1filter.frequency(analogValues[i]*10);
+        voice2filter.frequency(analogValues[i]*10);
+        voice3filter.frequency(analogValues[i]*10);
+        voice4filter.frequency(analogValues[i]*10);
+        voice5filter.frequency(analogValues[i]*10);
+        voice6filter.frequency(analogValues[i]*10);
+        voice7filter.frequency(analogValues[i]*10);
+        voice8filter.frequency(analogValues[i]*10);
+      }
+      if(i == 6){
+        //resonance
+        voice1filter.resonance((analogValues[i]/204)+.9);
+        voice2filter.resonance((analogValues[i]/204)+.9);
+        voice3filter.resonance((analogValues[i]/204)+.9);
+        voice4filter.resonance((analogValues[i]/204)+.9);
+        voice5filter.resonance((analogValues[i]/204)+.9);
+        voice6filter.resonance((analogValues[i]/204)+.9);
+        voice7filter.resonance((analogValues[i]/204)+.9);
+        voice8filter.resonance((analogValues[i]/204)+.9);
+      }
+      if(i == 15){
+        //lfo Mod
+        voice1filtermodmixer.gain(1, analogValues[i]/1023);
+        voice2filtermodmixer.gain(1, analogValues[i]/1023);
+        voice3filtermodmixer.gain(1, analogValues[i]/1023);
+        voice4filtermodmixer.gain(1, analogValues[i]/1023);
+        voice5filtermodmixer.gain(1, analogValues[i]/1023);
+        voice6filtermodmixer.gain(1, analogValues[i]/1023);
+        voice7filtermodmixer.gain(1, analogValues[i]/1023);
+        voice8filtermodmixer.gain(1, analogValues[i]/1023);
+      }
+      if(i == 13){
+        //env Mod
+        voice1filtermodmixer.gain(0, analogValues[i]/1023);
+        voice2filtermodmixer.gain(0, analogValues[i]/1023);
+        voice3filtermodmixer.gain(0, analogValues[i]/1023);
+        voice4filtermodmixer.gain(0, analogValues[i]/1023);
+        voice5filtermodmixer.gain(0, analogValues[i]/1023);
+        voice6filtermodmixer.gain(0, analogValues[i]/1023);
+        voice7filtermodmixer.gain(0, analogValues[i]/1023);
+        voice8filtermodmixer.gain(0, analogValues[i]/1023);
+      }
+      //delay
+//      if(i == 11){
+//        //time
+//        //delay1.delay(0, analogValues[i]/2.4);
+//      }
+//      if(i == 7){
+//        //feedback
+//        mainOutMixer.gain(3,analogValues[i]/1023);
+//      }
+      //pulseWidth
+      if(i == 1){
+        tempPulseWidth = 1 - (analogValues[i]/1023);
+        tempDetuneMod = analogValues[i]/2046;
+
+      }
+      analogValuesLag[i] = analogValues[i];   
+    }      
+  }
+  //ExtraAnalogIn
+//  for(int i=0; i<5; i++){
+//    extraAnalogValues[i] = getSmooth(extraAnalogPins[i]);
+//    if(i == 0){
+//      extraChangeThresh = 144;
+//    }else{
+//      extraChangeThresh = 1;
+//    }
+//    if (abs(extraAnalogValues[i] - extraAnalogValuesLag[i]) > extraChangeThresh || firstRunRead){
+//      if(i == 0){
+//        //key
+//        colorIndex = extraAnalogValues[i]/146;
+//        if(colorIndex < 7){
+//          keyIndex = colorIndex;
+//          redLevel = redLevelArray[colorIndex];
+//          blueLevel = blueLevelArray[colorIndex];
+//          greenLevel = greenLevelArray[colorIndex];
+//        }
+//      }
+//      if(i == 1){
+//        //attack
+//        if(firstRunRead){
+//          attackTimeFilter = extraAnalogValues[i]*2;
+//          attackTime = extraAnalogValues[i]*2;
+//        }
+//        if(envelopeFilter == LOW){
+//          attackTimeFilter = extraAnalogValues[i]*2;
+//        }else{
+//          attackTime = extraAnalogValues[i]*2;
+//        }
+//      }
+//      if(i == 2){
+//        //decay
+//        if(firstRunRead){
+//          decayTimeFilter = extraAnalogValues[i];
+//          decayTime = extraAnalogValues[i];
+//        }
+//        if(envelopeFilter == LOW){
+//          decayTimeFilter = extraAnalogValues[i];
+//        }else{
+//          decayTime = extraAnalogValues[i];
+//        }
+//      }
+//      if(i == 3){
+//        //sustain
+//        if(firstRunRead){
+//          sustainLevelFilter = extraAnalogValues[i];
+//          sustainLevelFilter = mapfloat(sustainLevelFilter, 0, 1023, -1, 1);
+//          sustainLevel = extraAnalogValues[i]/1023;
+//        }
+//        if(envelopeFilter == LOW){
+//          sustainLevelFilter = extraAnalogValues[i];
+//          sustainLevelFilter = mapfloat(sustainLevelFilter, 0, 1023, -1, 1);
+//        }else{
+//          sustainLevel = extraAnalogValues[i]/1023;
+//        }
+//      }
+//      if(i == 4){
+//        //release
+//        if(firstRunRead){
+//          releaseTimeFilter = extraAnalogValues[i]*2;
+//          releaseTime = extraAnalogValues[i]*2;
+//        }
+//        if(envelopeFilter == LOW){
+//          releaseTimeFilter = extraAnalogValues[i]*2;
+//        }else{
+//          releaseTime = extraAnalogValues[i]*2;
+//        }
+//      }
+//      extraAnalogValuesLag[i] = extraAnalogValues[i];
+//    }
 //  }
-//  else
-//  {
-//    deTuneLfo = ((tempPeak) * tempDetuneMod + 1);
-//    //Serial.println(deTuneLfo);
-//  }
+
+  //LFO Peak
+  if(peak1.available()){
+    tempPeak = peak1.read();
+    //Serial.println("reading peak value");
+  }
+  if(voiceBPulse){
+    voice1b.pulseWidth((tempPeak/2) + tempPulseWidth);
+    voice2b.pulseWidth((tempPeak/2) + tempPulseWidth);
+    voice3b.pulseWidth((tempPeak/2) + tempPulseWidth);
+    voice4b.pulseWidth((tempPeak/2) + tempPulseWidth);
+    voice5b.pulseWidth((tempPeak/2) + tempPulseWidth);
+    voice6b.pulseWidth((tempPeak/2) + tempPulseWidth);
+    voice7b.pulseWidth((tempPeak/2) + tempPulseWidth);
+    voice8b.pulseWidth((tempPeak/2) + tempPulseWidth);
+  }else{
+    deTuneLfo = ((tempPeak) * tempDetuneMod + 1);
+  }
+
   firstRunRead = false;
 
   if(millis() - stepWait > stepLength){
