@@ -4,97 +4,111 @@
 #include <SD.h>
 #include <SerialFlash.h>
 
-#include <Keypad.h>
-
 // GUItool: begin automatically generated code
-AudioSynthWaveformDc     lfoenvelope;    //xy=393.28997802734375,967.1499862670898
-AudioSynthWaveform       lfo;            //xy=481.28997802734375,1173.1499862670898
-AudioMixer4              mixer1;         //xy=524.2899780273437,1028.1499862670898
-AudioAnalyzePeak         peak1;          //xy=753.2899780273437,891.1499862670898
-AudioSynthWaveform       voice6b;        //xy=764.2999267578125,1461.2899780273437
-AudioSynthNoiseWhite     voice6n;        //xy=764.2999267578125,1496.2899780273437
-AudioSynthWaveform       voice7b;        //xy=764.14990234375,1685.4300537109375
-AudioSynthNoiseWhite     voice7n;        //xy=764.14990234375,1720.4300537109375
-AudioSynthWaveform       voice6a;        //xy=766.2999267578125,1423.2899780273437
-AudioSynthWaveform       voice5b;        //xy=770.85986328125,1195.85009765625
-AudioSynthWaveform       voice7a;        //xy=769.14990234375,1642.4300537109375
-AudioSynthNoiseWhite     voice5n;        //xy=770.85986328125,1230.85009765625
-AudioSynthWaveform       voice5a;        //xy=775.85986328125,1152.85009765625
-AudioSynthWaveform       voice8b;        //xy=779.2899169921875,1935.010009765625
-AudioSynthNoiseWhite     voice8n;        //xy=779.2899169921875,1970.010009765625
-AudioSynthWaveform       voice8a;        //xy=781.2899169921875,1897.010009765625
-AudioSynthWaveform       voice4a;        //xy=794.579833984375,930.4298706054687
-AudioSynthWaveform       voice4b;        //xy=795.579833984375,968.4298706054687
-AudioSynthNoiseWhite     voice4n;        //xy=795.579833984375,1003.4298706054687
-AudioSynthWaveform       voice3b;        //xy=869.43994140625,693.2899780273437
-AudioSynthNoiseWhite     voice3n;        //xy=869.43994140625,728.2899780273437
-AudioSynthWaveform       voice2b;        //xy=873.869873046875,458.42999267578125
-AudioSynthNoiseWhite     voice2n;        //xy=873.869873046875,493.42999267578125
-AudioSynthWaveform       voice1b;        //xy=875.1400146484375,238.719970703125
-AudioSynthNoiseWhite     voice1n;        //xy=875.2900390625,282.719970703125
-AudioSynthWaveform       voice3a;        //xy=874.43994140625,650.2899780273437
-AudioSynthWaveform       voice2a;        //xy=875.869873046875,420.42999267578125
-AudioSynthWaveform       voice1a;        //xy=880.1400146484375,195.719970703125
-AudioMixer4              voice6mix;      //xy=909.2999267578125,1481.2899780273437
-AudioMixer4              voice7mix;      //xy=909.14990234375,1705.4300537109375
-AudioMixer4              voice5mix;      //xy=915.85986328125,1215.85009765625
-AudioMixer4              voice8mix;      //xy=924.2899169921875,1955.010009765625
-AudioMixer4              voice4mix;      //xy=940.579833984375,988.4298706054687
-AudioMixer4              voice3mix;      //xy=1014.43994140625,713.2899780273437
-AudioMixer4              voice2mix;      //xy=1018.869873046875,478.42999267578125
-AudioMixer4              voice1mix;      //xy=1021.5700073242187,245.85999298095703
-AudioEffectWaveshaper    voice6waveshape; //xy=1101.8599853515625,1494.1199951171875
-AudioEffectWaveshaper    voice8waveshape; //xy=1110.429931640625,1962.72998046875
-AudioEffectWaveshaper    voice7waveshape; //xy=1114.7099609375,1709.8299560546875
-AudioEffectWaveshaper    voice5waveshape; //xy=1117.5699462890625,1236.8900146484375
-AudioSynthWaveformDc     voice8filterenv; //xy=1117.2899780273437,2088.14998626709
-AudioEffectWaveshaper    voice4waveshape; //xy=1126.130126953125,998.3199462890625
-AudioSynthWaveformDc     voice8env;      //xy=1131.2899780273437,2027.1499862670898
-AudioSynthWaveformDc     voice4filterenv; //xy=1139.2899780273437,1110.1499862670898
-AudioSynthWaveformDc     voice5filterenv; //xy=1140.2899780273437,1366.1499862670898
-AudioSynthWaveformDc     voice7filterenv; //xy=1149.2899780273437,1857.1499862670898
-AudioSynthWaveformDc     voice4env;      //xy=1153.2899780273437,1049.1499862670898
-AudioSynthWaveformDc     voice6filterenv; //xy=1152.2899780273437,1620.1499862670898
-AudioSynthWaveformDc     voice5env;      //xy=1154.2899780273437,1305.1499862670898
-AudioSynthWaveformDc     voice3filterenv; //xy=1160.2899780273437,862.1499862670898
-AudioSynthWaveformDc     voice7env;      //xy=1163.2899780273437,1796.1499862670898
-AudioSynthWaveformDc     voice6env;      //xy=1166.2899780273437,1559.1499862670898
-AudioSynthWaveformDc     voice3env;      //xy=1174.2899780273437,801.1499862670898
-AudioEffectWaveshaper    voice1waveshape;     //xy=1180.419921875,278.2899169921875
-AudioEffectWaveshaper    voice3waveshape; //xy=1183.280029296875,728.2899780273437
-AudioSynthWaveformDc     voice1filterenv; //xy=1191.2899780273437,386.14998626708984
-AudioSynthWaveformDc     voice2filterenv; //xy=1193.2899780273437,630.1499862670898
-AudioEffectWaveshaper    voice2waveshape; //xy=1194.7099609375,494
-AudioSynthWaveformDc     voice2env;      //xy=1207.2899780273437,569.1499862670898
-AudioSynthWaveformDc     voice1env;      //xy=1208.2899780273437,335.14998626708984
-AudioEffectMultiply      voice8multiply; //xy=1298.2899780273437,2000.1499862670898
-AudioMixer4              voice8filtermodmixer; //xy=1308.2899780273437,2116.14998626709
-AudioEffectMultiply      voice4multiply; //xy=1320.2899780273437,1022.1499862670898
-AudioEffectMultiply      voice5multiply; //xy=1321.2899780273437,1278.1499862670898
-AudioMixer4              voice4filtermodmixer; //xy=1330.2899780273437,1138.1499862670898
-AudioEffectMultiply      voice7multiply; //xy=1330.2899780273437,1769.1499862670898
-AudioEffectMultiply      voice6multiply; //xy=1333.2899780273437,1532.1499862670898
-AudioMixer4              voice5filtermodmixer; //xy=1338.2899780273437,1388.1499862670898
-AudioMixer4              voice6filtermodmixer; //xy=1343.2899780273437,1648.1499862670898
-AudioMixer4              voice7filtermodmixer; //xy=1347.2899780273437,1879.1499862670898
-AudioMixer4              voice3filtermodmixer; //xy=1358.2899780273437,884.1499862670898
-AudioEffectMultiply      voice3multiply; //xy=1367.0001220703125,777.0099487304687
-AudioEffectMultiply      voice2multiply; //xy=1374.2899780273437,542.1499862670898
-AudioMixer4              voice2filtermodmixer; //xy=1384.2899780273437,658.1499862670898
-AudioMixer4              voice1filtermodmixer; //xy=1388.2899780273437,418.14998626708984
-AudioEffectMultiply      voice1multiply; //xy=1398.429931640625,316.7200012207031
-AudioFilterStateVariable voice8filter;   //xy=1481.2899780273437,2023.1499862670898
-AudioFilterStateVariable voice5filter;   //xy=1501.2899780273437,1322.1499862670898
-AudioFilterStateVariable voice4filter;   //xy=1503.2899780273437,1045.1499862670898
-AudioFilterStateVariable voice7filter;   //xy=1510.2899780273437,1813.1499862670898
-AudioFilterStateVariable voice6filter;   //xy=1516.2899780273437,1555.1499862670898
-AudioFilterStateVariable voice3filter;   //xy=1521.2899780273437,818.1499862670898
-AudioFilterStateVariable voice2filter;   //xy=1557.2899780273437,565.1499862670898
-AudioFilterStateVariable voice1filter;   //xy=1574.2899780273437,360.14998626708984
-AudioMixer4              last4premix;    //xy=1981.2899780273437,1295.1499862670898
-AudioMixer4              first4premix;   //xy=1982.2899780273437,1211.1499862670898
-AudioMixer4              mainOutMixer;   //xy=2502.2899780273437,1288.1499862670898
-AudioOutputI2S           i2s1;           //xy=2728.2899780273437,1286.1499862670898
+AudioSynthWaveformDc     lfoenvelope;    //xy=65.5,954.0000514984131
+AudioSynthWaveform       lfo;            //xy=153.5,1160.000051498413
+AudioMixer4              mixer1;         //xy=196.5,1015.0000514984131
+AudioSynthWaveform       voice7b;        //xy=285.00401306152344,1671.0001311302185
+AudioSynthNoiseWhite     voice7n;        //xy=285.00401306152344,1706.0001311302185
+AudioSynthWaveform       voice7a;        //xy=290.00401306152344,1628.0001311302185
+AudioSynthWaveform       voice8b;        //xy=291.0039863586426,1914.0001373291016
+AudioSynthNoiseWhite     voice8n;        //xy=291.0039863586426,1949.0001373291016
+AudioSynthWaveform       voice8a;        //xy=293.0039863586426,1876.0001373291016
+AudioSynthWaveform       voice6a;        //xy=297.00396728515625,1431.0001029968262
+AudioSynthWaveform       voice6b;        //xy=297.0039520263672,1469.0001487731934
+AudioSynthNoiseWhite     voice6n;        //xy=297.0039520263672,1504.0001487731934
+AudioSynthWaveform       voice5b;        //xy=305.0039825439453,1206.0000295639038
+AudioSynthNoiseWhite     voice5n;        //xy=305.0039825439453,1241.0000295639038
+AudioSynthWaveform       voice5a;        //xy=310.0039825439453,1163.0000295639038
+AudioSynthWaveform       voice4a;        //xy=354.0039825439453,962.0000524520874
+AudioSynthWaveform       voice4b;        //xy=355.0039825439453,1000.0000524520874
+AudioSynthNoiseWhite     voice4n;        //xy=355.0039825439453,1035.0000524520874
+AudioAnalyzePeak         peak1;          //xy=366.0039291381836,916.0000066757202
+AudioSynthWaveform       voice3b;        //xy=397.0039939880371,632.0000762939453
+AudioSynthNoiseWhite     voice3n;        //xy=397.0039939880371,667.0000762939453
+AudioSynthWaveform       voice3a;        //xy=402.0039939880371,589.0000762939453
+AudioSynthWaveform       voice2b;        //xy=433.0039710998535,434.00001430511475
+AudioSynthNoiseWhite     voice2n;        //xy=433.0039710998535,469.00001430511475
+AudioSynthWaveform       voice2a;        //xy=435.0039710998535,396.00001430511475
+AudioMixer4              voice7mix;      //xy=430.00401306152344,1691.0001311302185
+AudioSynthWaveform       voice1b;        //xy=438.0039520263672,211.00001335144043
+AudioSynthNoiseWhite     voice1n;        //xy=438.0039520263672,255.00001335144043
+AudioSynthWaveform       voice1a;        //xy=443.0039520263672,168.00001335144043
+AudioMixer4              voice8mix;      //xy=436.0039863586426,1934.0001373291016
+AudioMixer4              voice6mix;      //xy=442.0039520263672,1489.0001487731934
+AudioMixer4              voice5mix;      //xy=450.0039825439453,1226.0000295639038
+AudioMixer4              voice4mix;      //xy=500.0039825439453,1020.0000524520874
+AudioMixer4              voice3mix;      //xy=548.0040893554688,629.0001049041748
+AudioMixer4              voice2mix;      //xy=565.0039558410645,434.0000219345093
+AudioAmplifier           voice8gain; //xy=568.0040435791016,1940.7539234161377
+AudioAmplifier           voice7gain; //xy=573.0039520263672,1701.7540092468262
+AudioMixer4              voice1mix;      //xy=584.0039520263672,218.00001335144043
+AudioAmplifier           voice6gain; //xy=585.00390625,1499.25394821167
+AudioAmplifier           voice5gain; //xy=588.0039520263672,1235.5039129257202
+AudioAmplifier           voice4gain; //xy=660.0038909912109,1017.2538976669312
+AudioAmplifier           voice3gain; //xy=712.0039520263672,651.0039510726929
+AudioAmplifier           voice2gain; //xy=716.0039520263672,457.00395011901855
+AudioAmplifier           voice1gain;           //xy=730.0039672851562,235.00392627716064
+AudioEffectWaveshaper    voice7waveshape; //xy=749.0039367675781,1705.00004196167
+AudioEffectWaveshaper    voice8waveshape; //xy=750.0039176940918,1950.000078201294
+AudioEffectWaveshaper    voice5waveshape; //xy=767.0038871765137,1228.0000066757202
+AudioEffectWaveshaper    voice6waveshape; //xy=767.0039215087891,1508.0000133514404
+AudioEffectWaveshaper    voice4waveshape; //xy=829.0039024353027,1011.0000524520874
+AudioEffectWaveshaper    voice3waveshape; //xy=880.0039520263672,678.0000438690186
+AudioEffectWaveshaper    voice2waveshape; //xy=886.0039367675781,473.99999141693115
+AudioEffectWaveshaper    voice1waveshape; //xy=895.0039520263672,252.00002574920654
+AudioAmplifier           voice7postgain; //xy=945.00390625,1727.50390625
+AudioAmplifier           voice6postgain; //xy=961.00390625,1504.75390625
+AudioAmplifier           voice8postgain; //xy=962.00390625,1968.50390625
+AudioSynthWaveformDc     voice8filterenv; //xy=969.00390625,2087
+AudioAmplifier           voice5postgain; //xy=984.00390625,1247.00390625
+AudioSynthWaveformDc     voice8env;      //xy=983.00390625,2026
+AudioSynthWaveformDc     voice4filterenv; //xy=991.00390625,1109
+AudioSynthWaveformDc     voice5filterenv; //xy=992.00390625,1365
+AudioSynthWaveformDc     voice7filterenv; //xy=1001.00390625,1856
+AudioSynthWaveformDc     voice4env;      //xy=1005.00390625,1048
+AudioSynthWaveformDc     voice6filterenv; //xy=1004.00390625,1619
+AudioSynthWaveformDc     voice5env;      //xy=1006.00390625,1304
+AudioAmplifier           voice4postgain; //xy=1008.0039367675781,1011.0038976669312
+AudioSynthWaveformDc     voice3filterenv; //xy=1012.00390625,861
+AudioSynthWaveformDc     voice7env;      //xy=1015.00390625,1795
+AudioSynthWaveformDc     voice6env;      //xy=1018.00390625,1558
+AudioSynthWaveformDc     voice3env;      //xy=1026.00390625,800
+AudioSynthWaveformDc     voice1filterenv; //xy=1043.00390625,385
+AudioSynthWaveformDc     voice2filterenv; //xy=1045.00390625,629
+AudioAmplifier           voice3postgain; //xy=1052.00390625,724.00390625
+AudioSynthWaveformDc     voice2env;      //xy=1059.00390625,568
+AudioSynthWaveformDc     voice1env;      //xy=1060.00390625,334
+AudioAmplifier           voice2postgain; //xy=1060.00390625,506.00390625
+AudioAmplifier           voice1postgain; //xy=1084.0039520263672,280.00390815734863
+AudioEffectMultiply      voice8multiply; //xy=1150.00390625,1999
+AudioMixer4              voice8filtermodmixer; //xy=1160.00390625,2115
+AudioEffectMultiply      voice4multiply; //xy=1172.00390625,1021
+AudioEffectMultiply      voice5multiply; //xy=1173.00390625,1277
+AudioMixer4              voice4filtermodmixer; //xy=1182.00390625,1137
+AudioEffectMultiply      voice7multiply; //xy=1182.00390625,1768
+AudioEffectMultiply      voice6multiply; //xy=1185.00390625,1531
+AudioMixer4              voice5filtermodmixer; //xy=1190.00390625,1387
+AudioMixer4              voice6filtermodmixer; //xy=1195.00390625,1647
+AudioMixer4              voice7filtermodmixer; //xy=1199.00390625,1878
+AudioMixer4              voice3filtermodmixer; //xy=1210.00390625,883
+AudioEffectMultiply      voice3multiply; //xy=1219.00390625,776
+AudioEffectMultiply      voice2multiply; //xy=1226.00390625,541
+AudioMixer4              voice2filtermodmixer; //xy=1236.00390625,657
+AudioMixer4              voice1filtermodmixer; //xy=1240.00390625,417
+AudioEffectMultiply      voice1multiply; //xy=1250.00390625,315
+AudioFilterStateVariable voice8filter;   //xy=1333.00390625,2022
+AudioFilterStateVariable voice5filter;   //xy=1353.00390625,1321
+AudioFilterStateVariable voice4filter;   //xy=1355.00390625,1044
+AudioFilterStateVariable voice7filter;   //xy=1362.00390625,1812
+AudioFilterStateVariable voice6filter;   //xy=1368.00390625,1554
+AudioFilterStateVariable voice3filter;   //xy=1373.00390625,817
+AudioFilterStateVariable voice2filter;   //xy=1409.00390625,564
+AudioFilterStateVariable voice1filter;   //xy=1426.00390625,359
+AudioMixer4              last4premix;    //xy=1833.00390625,1294
+AudioMixer4              first4premix;   //xy=1834.00390625,1210
+AudioMixer4              mainOutMixer;   //xy=2354.00390625,1287
+AudioOutputI2S           i2s1;           //xy=2580.00390625,1285
 AudioConnection          patchCord1(lfoenvelope, 0, mixer1, 0);
 AudioConnection          patchCord2(lfo, 0, voice1filtermodmixer, 1);
 AudioConnection          patchCord3(lfo, 0, voice2filtermodmixer, 1);
@@ -106,115 +120,121 @@ AudioConnection          patchCord8(lfo, 0, voice7filtermodmixer, 1);
 AudioConnection          patchCord9(lfo, 0, voice8filtermodmixer, 1);
 AudioConnection          patchCord10(lfo, 0, mixer1, 1);
 AudioConnection          patchCord11(mixer1, peak1);
-AudioConnection          patchCord12(voice6b, 0, voice6mix, 1);
-AudioConnection          patchCord13(voice6n, 0, voice6mix, 2);
-AudioConnection          patchCord14(voice7b, 0, voice7mix, 1);
-AudioConnection          patchCord15(voice7n, 0, voice7mix, 2);
-AudioConnection          patchCord16(voice6a, 0, voice6mix, 0);
-AudioConnection          patchCord17(voice5b, 0, voice5mix, 1);
-AudioConnection          patchCord18(voice7a, 0, voice7mix, 0);
-AudioConnection          patchCord19(voice5n, 0, voice5mix, 2);
-AudioConnection          patchCord20(voice5a, 0, voice5mix, 0);
-AudioConnection          patchCord21(voice8b, 0, voice8mix, 1);
-AudioConnection          patchCord22(voice8n, 0, voice8mix, 2);
-AudioConnection          patchCord23(voice8a, 0, voice8mix, 0);
+AudioConnection          patchCord12(voice7b, 0, voice7mix, 1);
+AudioConnection          patchCord13(voice7n, 0, voice7mix, 2);
+AudioConnection          patchCord14(voice7a, 0, voice7mix, 0);
+AudioConnection          patchCord15(voice8b, 0, voice8mix, 1);
+AudioConnection          patchCord16(voice8n, 0, voice8mix, 2);
+AudioConnection          patchCord17(voice8a, 0, voice8mix, 0);
+AudioConnection          patchCord18(voice6a, 0, voice6mix, 0);
+AudioConnection          patchCord19(voice6b, 0, voice6mix, 1);
+AudioConnection          patchCord20(voice6n, 0, voice6mix, 2);
+AudioConnection          patchCord21(voice5b, 0, voice5mix, 1);
+AudioConnection          patchCord22(voice5n, 0, voice5mix, 2);
+AudioConnection          patchCord23(voice5a, 0, voice5mix, 0);
 AudioConnection          patchCord24(voice4a, 0, voice4mix, 0);
 AudioConnection          patchCord25(voice4b, 0, voice4mix, 1);
 AudioConnection          patchCord26(voice4n, 0, voice4mix, 2);
 AudioConnection          patchCord27(voice3b, 0, voice3mix, 1);
 AudioConnection          patchCord28(voice3n, 0, voice3mix, 2);
-AudioConnection          patchCord29(voice2b, 0, voice2mix, 1);
-AudioConnection          patchCord30(voice2n, 0, voice2mix, 3);
-AudioConnection          patchCord31(voice1b, 0, voice1mix, 1);
-AudioConnection          patchCord32(voice1n, 0, voice1mix, 2);
-AudioConnection          patchCord33(voice3a, 0, voice3mix, 0);
-AudioConnection          patchCord34(voice2a, 0, voice2mix, 0);
-AudioConnection          patchCord35(voice1a, 0, voice1mix, 0);
-AudioConnection          patchCord36(voice6mix, voice6waveshape);
-AudioConnection          patchCord37(voice7mix, voice7waveshape);
-AudioConnection          patchCord38(voice5mix, voice5waveshape);
-AudioConnection          patchCord39(voice8mix, voice8waveshape);
-AudioConnection          patchCord40(voice4mix, voice4waveshape);
-AudioConnection          patchCord41(voice3mix, voice3waveshape);
-AudioConnection          patchCord42(voice2mix, voice2waveshape);
-AudioConnection          patchCord43(voice1mix, voice1waveshape);
-AudioConnection          patchCord44(voice6waveshape, 0, voice6multiply, 0);
-AudioConnection          patchCord45(voice8waveshape, 0, voice8multiply, 0);
-AudioConnection          patchCord46(voice7waveshape, 0, voice7multiply, 0);
-AudioConnection          patchCord47(voice5waveshape, 0, voice5multiply, 0);
-AudioConnection          patchCord48(voice8filterenv, 0, voice8filtermodmixer, 0);
-AudioConnection          patchCord49(voice4waveshape, 0, voice4multiply, 0);
-AudioConnection          patchCord50(voice8env, 0, voice8multiply, 1);
-AudioConnection          patchCord51(voice4filterenv, 0, voice4filtermodmixer, 0);
-AudioConnection          patchCord52(voice5filterenv, 0, voice5filtermodmixer, 0);
-AudioConnection          patchCord53(voice7filterenv, 0, voice7filtermodmixer, 0);
-AudioConnection          patchCord54(voice4env, 0, voice4multiply, 1);
-AudioConnection          patchCord55(voice6filterenv, 0, voice6filtermodmixer, 0);
-AudioConnection          patchCord56(voice5env, 0, voice5multiply, 1);
-AudioConnection          patchCord57(voice3filterenv, 0, voice3filtermodmixer, 0);
-AudioConnection          patchCord58(voice7env, 0, voice7multiply, 1);
-AudioConnection          patchCord59(voice6env, 0, voice6multiply, 1);
-AudioConnection          patchCord60(voice3env, 0, voice3multiply, 1);
-AudioConnection          patchCord61(voice1waveshape, 0, voice1multiply, 0);
-AudioConnection          patchCord62(voice3waveshape, 0, voice3multiply, 0);
-AudioConnection          patchCord63(voice1filterenv, 0, voice1filtermodmixer, 0);
-AudioConnection          patchCord64(voice2filterenv, 0, voice2filtermodmixer, 0);
-AudioConnection          patchCord65(voice2waveshape, 0, voice2multiply, 0);
-AudioConnection          patchCord66(voice2env, 0, voice2multiply, 1);
-AudioConnection          patchCord67(voice1env, 0, voice1multiply, 1);
-AudioConnection          patchCord68(voice8multiply, 0, voice8filter, 0);
-AudioConnection          patchCord69(voice8filtermodmixer, 0, voice8filter, 1);
-AudioConnection          patchCord70(voice4multiply, 0, voice4filter, 0);
-AudioConnection          patchCord71(voice5multiply, 0, voice5filter, 0);
-AudioConnection          patchCord72(voice4filtermodmixer, 0, voice4filter, 1);
-AudioConnection          patchCord73(voice7multiply, 0, voice7filter, 0);
-AudioConnection          patchCord74(voice6multiply, 0, voice6filter, 0);
-AudioConnection          patchCord75(voice5filtermodmixer, 0, voice5filter, 1);
-AudioConnection          patchCord76(voice6filtermodmixer, 0, voice6filter, 1);
-AudioConnection          patchCord77(voice7filtermodmixer, 0, voice7filter, 1);
-AudioConnection          patchCord78(voice3filtermodmixer, 0, voice3filter, 1);
-AudioConnection          patchCord79(voice3multiply, 0, voice3filter, 0);
-AudioConnection          patchCord80(voice2multiply, 0, voice2filter, 0);
-AudioConnection          patchCord81(voice2filtermodmixer, 0, voice2filter, 1);
-AudioConnection          patchCord82(voice1filtermodmixer, 0, voice1filter, 1);
-AudioConnection          patchCord83(voice1multiply, 0, voice1filter, 0);
-AudioConnection          patchCord84(voice8filter, 0, last4premix, 3);
-AudioConnection          patchCord85(voice5filter, 0, last4premix, 0);
-AudioConnection          patchCord86(voice4filter, 0, first4premix, 3);
-AudioConnection          patchCord87(voice7filter, 0, last4premix, 2);
-AudioConnection          patchCord88(voice6filter, 0, last4premix, 1);
-AudioConnection          patchCord89(voice3filter, 0, first4premix, 2);
-AudioConnection          patchCord90(voice2filter, 0, first4premix, 1);
-AudioConnection          patchCord91(voice1filter, 0, first4premix, 0);
-AudioConnection          patchCord92(last4premix, 0, mainOutMixer, 1);
-AudioConnection          patchCord93(first4premix, 0, mainOutMixer, 0);
-AudioConnection          patchCord94(mainOutMixer, 0, i2s1, 0);
-AudioConnection          patchCord95(mainOutMixer, 0, i2s1, 1);
-AudioControlSGTL5000     sgtl5000_1;     //xy=2465.2899780273437,1055.1499862670898
+AudioConnection          patchCord29(voice3a, 0, voice3mix, 0);
+AudioConnection          patchCord30(voice2b, 0, voice2mix, 1);
+AudioConnection          patchCord31(voice2n, 0, voice2mix, 3);
+AudioConnection          patchCord32(voice2a, 0, voice2mix, 0);
+AudioConnection          patchCord33(voice7mix, voice7gain);
+AudioConnection          patchCord34(voice1b, 0, voice1mix, 1);
+AudioConnection          patchCord35(voice1n, 0, voice1mix, 2);
+AudioConnection          patchCord36(voice1a, 0, voice1mix, 0);
+AudioConnection          patchCord37(voice8mix, voice8gain);
+AudioConnection          patchCord38(voice6mix, voice6gain);
+AudioConnection          patchCord39(voice5mix, voice5gain);
+AudioConnection          patchCord40(voice4mix, voice4gain);
+AudioConnection          patchCord41(voice3mix, voice3gain);
+AudioConnection          patchCord42(voice2mix, voice2gain);
+AudioConnection          patchCord43(voice8gain, voice8waveshape);
+AudioConnection          patchCord44(voice7gain, voice7waveshape);
+AudioConnection          patchCord45(voice1mix, voice1gain);
+AudioConnection          patchCord46(voice6gain, voice6waveshape);
+AudioConnection          patchCord47(voice5gain, voice5waveshape);
+AudioConnection          patchCord48(voice4gain, voice4waveshape);
+AudioConnection          patchCord49(voice3gain, voice3waveshape);
+AudioConnection          patchCord50(voice2gain, voice2waveshape);
+AudioConnection          patchCord51(voice1gain, voice1waveshape);
+AudioConnection          patchCord52(voice7waveshape, voice7postgain);
+AudioConnection          patchCord53(voice8waveshape, voice8postgain);
+AudioConnection          patchCord54(voice5waveshape, voice5postgain);
+AudioConnection          patchCord55(voice6waveshape, voice6postgain);
+AudioConnection          patchCord56(voice4waveshape, voice4postgain);
+AudioConnection          patchCord57(voice3waveshape, voice3postgain);
+AudioConnection          patchCord58(voice2waveshape, voice2postgain);
+AudioConnection          patchCord59(voice1waveshape, voice1postgain);
+AudioConnection          patchCord60(voice7postgain, 0, voice7multiply, 0);
+AudioConnection          patchCord61(voice6postgain, 0, voice6multiply, 0);
+AudioConnection          patchCord62(voice8postgain, 0, voice8multiply, 0);
+AudioConnection          patchCord63(voice8filterenv, 0, voice8filtermodmixer, 0);
+AudioConnection          patchCord64(voice5postgain, 0, voice5multiply, 0);
+AudioConnection          patchCord65(voice8env, 0, voice8multiply, 1);
+AudioConnection          patchCord66(voice4filterenv, 0, voice4filtermodmixer, 0);
+AudioConnection          patchCord67(voice5filterenv, 0, voice5filtermodmixer, 0);
+AudioConnection          patchCord68(voice7filterenv, 0, voice7filtermodmixer, 0);
+AudioConnection          patchCord69(voice4env, 0, voice4multiply, 1);
+AudioConnection          patchCord70(voice6filterenv, 0, voice6filtermodmixer, 0);
+AudioConnection          patchCord71(voice5env, 0, voice5multiply, 1);
+AudioConnection          patchCord72(voice4postgain, 0, voice4multiply, 0);
+AudioConnection          patchCord73(voice3filterenv, 0, voice3filtermodmixer, 0);
+AudioConnection          patchCord74(voice7env, 0, voice7multiply, 1);
+AudioConnection          patchCord75(voice6env, 0, voice6multiply, 1);
+AudioConnection          patchCord76(voice3env, 0, voice3multiply, 1);
+AudioConnection          patchCord77(voice1filterenv, 0, voice1filtermodmixer, 0);
+AudioConnection          patchCord78(voice2filterenv, 0, voice2filtermodmixer, 0);
+AudioConnection          patchCord79(voice3postgain, 0, voice3multiply, 0);
+AudioConnection          patchCord80(voice2env, 0, voice2multiply, 1);
+AudioConnection          patchCord81(voice1env, 0, voice1multiply, 1);
+AudioConnection          patchCord82(voice2postgain, 0, voice2multiply, 0);
+AudioConnection          patchCord83(voice1postgain, 0, voice1multiply, 0);
+AudioConnection          patchCord84(voice8multiply, 0, voice8filter, 0);
+AudioConnection          patchCord85(voice8filtermodmixer, 0, voice8filter, 1);
+AudioConnection          patchCord86(voice4multiply, 0, voice4filter, 0);
+AudioConnection          patchCord87(voice5multiply, 0, voice5filter, 0);
+AudioConnection          patchCord88(voice4filtermodmixer, 0, voice4filter, 1);
+AudioConnection          patchCord89(voice7multiply, 0, voice7filter, 0);
+AudioConnection          patchCord90(voice6multiply, 0, voice6filter, 0);
+AudioConnection          patchCord91(voice5filtermodmixer, 0, voice5filter, 1);
+AudioConnection          patchCord92(voice6filtermodmixer, 0, voice6filter, 1);
+AudioConnection          patchCord93(voice7filtermodmixer, 0, voice7filter, 1);
+AudioConnection          patchCord94(voice3filtermodmixer, 0, voice3filter, 1);
+AudioConnection          patchCord95(voice3multiply, 0, voice3filter, 0);
+AudioConnection          patchCord96(voice2multiply, 0, voice2filter, 0);
+AudioConnection          patchCord97(voice2filtermodmixer, 0, voice2filter, 1);
+AudioConnection          patchCord98(voice1filtermodmixer, 0, voice1filter, 1);
+AudioConnection          patchCord99(voice1multiply, 0, voice1filter, 0);
+AudioConnection          patchCord100(voice8filter, 0, last4premix, 3);
+AudioConnection          patchCord101(voice5filter, 0, last4premix, 0);
+AudioConnection          patchCord102(voice4filter, 0, first4premix, 3);
+AudioConnection          patchCord103(voice7filter, 0, last4premix, 2);
+AudioConnection          patchCord104(voice6filter, 0, last4premix, 1);
+AudioConnection          patchCord105(voice3filter, 0, first4premix, 2);
+AudioConnection          patchCord106(voice2filter, 0, first4premix, 1);
+AudioConnection          patchCord107(voice1filter, 0, first4premix, 0);
+AudioConnection          patchCord108(last4premix, 0, mainOutMixer, 1);
+AudioConnection          patchCord109(first4premix, 0, mainOutMixer, 0);
+AudioConnection          patchCord110(mainOutMixer, 0, i2s1, 0);
+AudioConnection          patchCord111(mainOutMixer, 0, i2s1, 1);
+AudioControlSGTL5000     sgtl5000_1;     //xy=2317.00390625,1054
 // GUItool: end automatically generated code
+
 
 
 //config variables
 #define NUM_BTN_COLUMNS (4)
 #define NUM_BTN_ROWS (4)
-#define NUM_LED_COLUMNS (4)
-#define NUM_LED_ROWS (2)
 
-byte btncolumnpins[NUM_BTN_COLUMNS] = {2, 3, 4, 5};
-byte btnrowpins[NUM_BTN_ROWS]       = {6, 7, 31,32};
+#define MAX_DEBOUNCE (3)
 
-char keys[NUM_BTN_ROWS][NUM_BTN_COLUMNS] = {
-    { 'a','b','c','d' },
-    { 'e','f','g','h' },
-    { '1','2','3','4' },
-    { '5','6','7','8' }
-};
+static const uint8_t btncolumnpins[NUM_BTN_COLUMNS] = {2, 3, 4, 5};
+static const uint8_t btnrowpins[NUM_BTN_ROWS]       = {6, 7, 31,32};
 
-static const uint8_t ledcolumnpins[NUM_LED_COLUMNS] = {23, 22, 21, 20}; //42,43,44,45 //LED GND 4,3,2,1
-static const uint8_t redpins[NUM_LED_ROWS]        = {17, 16}; //22,30,33,36 //Red 1,2,3,4
-static const uint8_t greenpins[NUM_LED_ROWS]        = {15, 14}; 
-
-Keypad keypad = Keypad( makeKeymap(keys), btnrowpins, btncolumnpins, NUM_BTN_ROWS, NUM_BTN_COLUMNS );
+static int8_t debounce_count[NUM_BTN_COLUMNS][NUM_BTN_ROWS];
 
 int colorIndex;
 int keyIndex;
@@ -234,6 +254,7 @@ int steps[8][8];
 
 int btnState[16];
 int prevBtnState[16];
+
 
 //Analog Inputs
 float analogValues[16];
@@ -286,12 +307,28 @@ short lfoWaveShapes[5] = {
   WAVEFORM_SAMPLE_HOLD,
 };
 
-//Waveshaper array
+
+//float WAVESHAPE_YAMAHA[17] = {
+//    -1.0000,   -0.4 ,  -0.341,   -0.754,   -0.875,   -0.361,
+//   -0.672,   -0.165,         0,    0.165,    0.362,    0.361,
+//    0.675,    0.8154,    0.141,    0.977,    1.0000
+//};
+
 float WAVESHAPE_YAMAHA[17] = {
-    -1.0000,   -0.9775 ,  -0.9141,   -0.8154,   -0.6875,   -0.5361,
+       -1.0000,   -0.9775 ,  -0.9141,   -0.8154,   -0.6875,   -0.5361,
    -0.3672,   -0.1865,         0,    0.1865,    0.3672,    0.5361,
     0.6875,    0.8154,    0.9141,    0.9775,    1.0000,
 };
+
+//float WAVESHAPE_YAMAHA[17] = {
+//  -1.00000,-0.87500,-0.75000,-0.62500,-0.50000,-0.37500,-0.25000,-0.12500
+//, 0.00000, 0.12500, 0.25000, 0.37500, 0.50000, 0.62500, 0.75000, 0.87500
+//, 1.00000
+//
+//};
+
+float pregain;
+float postgain;
 
 //ADSR
 int attackTime;
@@ -342,29 +379,29 @@ void setup() {
   last4premix.gain(3, .25);
 
   //Voice 1
-  voice1a.begin(.3,440,WAVEFORM_SQUARE);
-  voice1b.begin(.3,440,WAVEFORM_SQUARE);
+  voice1a.begin(.3,440,WAVEFORM_SAWTOOTH);
+  voice1b.begin(.3,440,WAVEFORM_SAWTOOTH);
   //Voice 2
-  voice2a.begin(.3,440,WAVEFORM_SQUARE);
-  voice2b.begin(.3,440,WAVEFORM_SQUARE);
+  voice2a.begin(.3,440,WAVEFORM_SAWTOOTH);
+  voice2b.begin(.3,440,WAVEFORM_SAWTOOTH);
   //Voice 3
-  voice3a.begin(.3,440,WAVEFORM_SQUARE);
-  voice3b.begin(.3,440,WAVEFORM_SQUARE);
+  voice3a.begin(.3,440,WAVEFORM_SAWTOOTH);
+  voice3b.begin(.3,440,WAVEFORM_SAWTOOTH);
   //Voice 4
-  voice4a.begin(.3,440,WAVEFORM_SQUARE);
-  voice4b.begin(.3,440,WAVEFORM_SQUARE);
+  voice4a.begin(.3,440,WAVEFORM_SAWTOOTH);
+  voice4b.begin(.3,440,WAVEFORM_SAWTOOTH);
   //Voice 5
-  voice5a.begin(.3,440,WAVEFORM_SQUARE);
-  voice5b.begin(.3,440,WAVEFORM_SQUARE);
+  voice5a.begin(.3,440,WAVEFORM_SAWTOOTH);
+  voice5b.begin(.3,440,WAVEFORM_SAWTOOTH);
   //Voice 6
-  voice6a.begin(.3,440,WAVEFORM_SQUARE);
-  voice6b.begin(.3,440,WAVEFORM_SQUARE);
+  voice6a.begin(.3,440,WAVEFORM_SAWTOOTH);
+  voice6b.begin(.3,440,WAVEFORM_SAWTOOTH);
   //Voice 7
-  voice7a.begin(.3,440,WAVEFORM_SQUARE);
-  voice7b.begin(.3,440,WAVEFORM_SQUARE);
+  voice7a.begin(.3,440,WAVEFORM_SAWTOOTH);
+  voice7b.begin(.3,440,WAVEFORM_SAWTOOTH);
   //Voice 8
-  voice8a.begin(.3,440,WAVEFORM_SQUARE);
-  voice8b.begin(.3,440,WAVEFORM_SQUARE);
+  voice8a.begin(.3,440,WAVEFORM_SAWTOOTH);
+  voice8b.begin(.3,440,WAVEFORM_SAWTOOTH);
 
   float noiseAmplitude = 0;
   
@@ -377,6 +414,15 @@ void setup() {
   voice7n.amplitude(0);
   voice8n.amplitude(0);
 
+  voice1gain.gain(1);
+  voice2gain.gain(1);
+  voice3gain.gain(1);
+  voice4gain.gain(1);
+  voice5gain.gain(1);
+  voice6gain.gain(1);
+  voice7gain.gain(1);
+  voice8gain.gain(1);
+  
   voice1waveshape.shape(WAVESHAPE_YAMAHA, 17);
   voice2waveshape.shape(WAVESHAPE_YAMAHA, 17);
   voice3waveshape.shape(WAVESHAPE_YAMAHA, 17);
@@ -385,6 +431,18 @@ void setup() {
   voice6waveshape.shape(WAVESHAPE_YAMAHA, 17);
   voice7waveshape.shape(WAVESHAPE_YAMAHA, 17);
   voice8waveshape.shape(WAVESHAPE_YAMAHA, 17);
+
+  voice1postgain.gain(1);
+  voice2postgain.gain(1);
+  voice3postgain.gain(1);
+  voice4postgain.gain(1);
+  voice5postgain.gain(1);
+  voice6postgain.gain(1);
+  voice7postgain.gain(1);
+  voice8postgain.gain(1);
+
+  pregain = 1;
+  postgain = 1;
   
   //frequency
   double filterfreq = 5000;
@@ -465,119 +523,54 @@ void setup() {
 
   attackTimeFilter = 0;
   decayTimeFilter = 0;
-  sustainLevelFilter = 1;
+  sustainLevelFilter = 0.5;
   releaseTimeFilter = 500;
 
   attackTime = 0;
   decayTime = 250;
   sustainLevel= 1;
-  releaseTime= 500;
+  releaseTime= 0;
 
   //Sequencer
   stepLength = 250; //BPM
   stepWait = 0;
   activeStep = 0;
 
-  steps[0][4] = 1;
-  steps[1][3] = 1;
-  steps[2][1] = 1;
-  steps[3][5] = 1;
-  steps[4][0] = 1;
-  steps[5][3] = 1;
-  steps[6][3] = 1;
-  steps[7][4] = 1;
-
   firstRunRead = true;
 
   tempDetuneMod = 0.25;
 
+//  pinMode(A18, INPUT);
+//  pinMode(A19, INPUT);
+//  pinMode(A20, INPUT);
+//
+//  pinMode(32, INPUT_PULLUP);
+//  pinMode(33, OUTPUT);
+
   uint8_t i;
 
-// LED column lines
-  for(i = 0; i < NUM_LED_COLUMNS; i++)
+  // button columns
+  for (i = 0; i < NUM_BTN_COLUMNS; i++)
   {
-    pinMode(ledcolumnpins[i], OUTPUT);
+    pinMode(btncolumnpins[i], OUTPUT);
 
     // with nothing selected by default
-    digitalWrite(ledcolumnpins[i], HIGH);
+    digitalWrite(btncolumnpins[i], HIGH);
   }
 
-    // LED red row lines
-  for(i = 0; i < NUM_LED_ROWS; i++)
+  // button row input lines
+  for (i = 0; i < NUM_BTN_ROWS; i++)
   {
-    pinMode(redpins[i], OUTPUT);
-
-    // with nothing driven by default
-    digitalWrite(redpins[i], LOW);
+    pinMode(btnrowpins[i], INPUT_PULLUP);
   }
 
-  
-  // LED green row lines
-  for(i = 0; i < NUM_LED_ROWS; i++)
+  // Initialize the debounce counter array
+  for (uint8_t i = 0; i < NUM_BTN_COLUMNS; i++)
   {
-    pinMode(greenpins[i], OUTPUT);
-
-    // with nothing driven by default
-    digitalWrite(greenpins[i], LOW);
-  }
-}
-
-static void scanLEDs()
-{
-
-  uint8_t val;
-  uint8_t i;
-  static uint8_t current;
-  uint8_t index = 0; 
-  
-  // Select a column
-  digitalWrite(ledcolumnpins[current], LOW);
-
-  // write the row pins
-  for(i = 0; i < NUM_LED_ROWS; i++)
-  {
-    index = i*NUM_LED_COLUMNS+current;
-    //check if this is the activeStep
-    if(index == activeStep){
-  
-      digitalWrite(redpins[i],HIGH);
-      
-//        Serial.println("active step");
-//        Serial.println(index);
-//        Serial.println("current");
-//        Serial.println(current);
-      
+    for (uint8_t j = 0; j < NUM_BTN_ROWS; j++)
+    {
+      debounce_count[i][j] = 0;
     }
-  //otherwise check if this step has a note
-  
-    else {
-      for(int j = 0; j < 8; j++){
-        if(steps[index][j] == 1)
-        {
-//                Serial.println("mark step");
-//                Serial.println(index);
-//                Serial.println(i);
-                digitalWrite(greenpins[i], HIGH);
-        }
-      }
-    }
-  }
-
-  delay(1);
-
-  digitalWrite(ledcolumnpins[current], HIGH);
-
-  for(i = 0; i < NUM_LED_ROWS; i++)
-  {
-    digitalWrite(redpins[i], LOW);
-    digitalWrite(greenpins[i], LOW);
-  }
-
-  // Move on to the next column
-  current++;
-  if (current >= NUM_LED_COLUMNS)
-  {
-    current = 0;
   }
 
 }
@@ -615,7 +608,7 @@ void buttonUpdate(int i){
           voice2filterenv.amplitude(1,attackTimeFilter);
           noteTrigFlag[i] = true;
           attackWait[i] = millis();
-          //Serial.println("button pressed");
+          Serial.println("button pressed");
         }else{
           noteTrigFlag[i] = false;
           voice2env.amplitude(0,releaseTime);
@@ -696,124 +689,138 @@ void buttonUpdate(int i){
       }
 }
 
-static void scanButtons()
+static void scan()
 {
-
-  String msg;
+  static uint8_t current = 0;
+  uint8_t val;
+  uint8_t i, j;
+  int index = 0;;
   
-  if (keypad.getKeys())
+  for(int i = 0; i < NUM_BTN_COLUMNS; i++){
+    
+    // Select current columns
+    digitalWrite(btncolumnpins[i], LOW);
+    //digitalWrite(ledcolumnpins[current], LOW);
+  
+    // pause a moment
+    delay(1);
+  
+    // Read the button inputs
+    for ( j = 0; j < NUM_BTN_ROWS; j++)
     {
-        for (int i=0; i<LIST_MAX; i++)   // Scan the whole key list.
+      index = j*NUM_BTN_COLUMNS+i;
+      
+      val = digitalRead(btnrowpins[j]);
+
+      //Serial.println(prevBtnState);
+      
+      if (val == LOW)
+      {
+        // active low: val is low when btn is pressed
+        if ( debounce_count[i][j] < MAX_DEBOUNCE)
         {
-            if ( keypad.key[i].stateChanged )   // Only find keys that have changed state.
-            {
-                switch (keypad.key[i].kstate) {  // Report active key state : IDLE, PRESSED, HOLD, or RELEASED
-                    case PRESSED:
-                    msg = " PRESSED.";
-                break;
-                    case HOLD:
-                    msg = " HOLD.";
-                break;
-                    case RELEASED:
-                    msg = " RELEASED.";
-                break;
-                    case IDLE:
-                    msg = " IDLE.";
+          debounce_count[i][j]++;
+          if ( debounce_count[i][j] == MAX_DEBOUNCE )
+          {
+            
+            Serial.print("Key Down ");
+            Serial.println(index);
+            Serial.println("row:");
+            Serial.println(j);
+            Serial.println("column:");
+            Serial.println(i); 
+            
+//            Serial.println("btnState:");
+//            Serial.println(btnState);
+//            Serial.println("previous:");
+//            Serial.println(prevBtnState);
+
+            if(j == 0 || j == 1){
+              for(int k = 0; k< 8; k++){
+                Serial.println(buttonHeld[k]);
+                if(buttonHeld[k]){
+                  Serial.println("sequencer input");
+                  Serial.println("button");
+                  Serial.println(k);
+                  Serial.println("at step");
+                  Serial.println(index);
+                  steps[index][k] = 1; 
                 }
-                Serial.print("Key ");
-                Serial.print(keypad.key[i].kchar);
-                Serial.println(msg);
+              }
             }
+            else{
+              index = index%8;
+              Serial.println("note triggered");
+              Serial.println(index);
+              buttonHeld[index]= 1;  
+              
+              btnState[index] = LOW;
+            
+              buttonUpdate(index);
+
+            
+            }
+          }
         }
-    }
-//            
-//            Serial.print("Key Down ");
-//            Serial.println(index);
-//            Serial.println("row:");
-//            Serial.println(j);
-//            Serial.println("column:");
-//            Serial.println(i); 
-//            
-////            Serial.println("btnState:");
-////            Serial.println(btnState);
-////            Serial.println("previous:");
-////            Serial.println(prevBtnState);
-//
-//            if(j == 0 || j == 1){
-//              for(int k = 0; k< 8; k++){
-//                Serial.println(buttonHeld[k]);
-//                if(buttonHeld[k]){
-//                  Serial.println("sequencer input");
-//                  Serial.println("button");
-//                  Serial.println(k);
-//                  Serial.println("at step");
-//                  Serial.println(index);
-//                  steps[index][k] = 1; 
-//                }
-//              }
-//            }
-//            else{
-//              index = index%8;
-//              Serial.println("note triggered");
-//              Serial.println(index);
-//              buttonHeld[index]= 1;  
-//              
-//              btnState[index] = LOW;
-//            
-//              buttonUpdate(index);
-//
-//            
-//            }
-//          }
-//        }
-//      }
-//      else
-//      {
-//        // otherwise, button is released
-//        if ( debounce_count[i][j] > 0)
-//        {
-//          debounce_count[i][j]--;
-//          if ( debounce_count[i][j] == 0 )
-//          {
-//            Serial.print("Key Up ");
-//            Serial.println(index);
-//            Serial.println("row:");
-//            Serial.println(j);
-//            Serial.println("column:");
-//            Serial.println(i); 
-//
-//            if(j== 2 || j == 3){
-//              index = index%8;
-//              
-//              Serial.println("note released");
-//              Serial.println(index);
-//              
-//              buttonHeld[index] = 0;
-//              
-//              btnState[index] = HIGH;
-//
-//              buttonUpdate(index);
+      }
+      else
+      {
+        // otherwise, button is released
+        if ( debounce_count[i][j] > 0)
+        {
+          debounce_count[i][j]--;
+          if ( debounce_count[i][j] == 0 )
+          {
+            Serial.print("Key Up ");
+            Serial.println(index);
+            Serial.println("row:");
+            Serial.println(j);
+            Serial.println("column:");
+            Serial.println(i); 
+
+            if(j== 2 || j == 3){
+              index = index%8;
+              
+              Serial.println("note released");
+              Serial.println(index);
+              
+              buttonHeld[index] = 0;
+              
+              btnState[index] = HIGH;
+
+              buttonUpdate(index);
+            }
+          }
+        }
+      } 
+    }// for j = 0 to 3;
+
+    delay(1);
+  
+    digitalWrite(btncolumnpins[i], HIGH);
+
+  }
 }  
 
 void advanceSequencer(){
 
   for(int index = 0; index< 8; index++){ 
-    if(steps[activeStep][index]){
+    if(!buttonHeld[index]){
+      if(steps[activeStep][index]){
       
-//      Serial.println("note triggered");
-//      Serial.println("activeStep");
-//      Serial.println(activeStep);
-
-      //set prevBtnState to high to always retrig envelopes
-      prevBtnState[index] = HIGH;
-      btnState[index] = LOW;
-      buttonUpdate(index);
-                
-    }
-    else {  
-
-      btnState[index] = HIGH;
-      buttonUpdate(index);
+        Serial.println("note triggered");
+        Serial.println("activeStep");
+        Serial.println(activeStep);
+          //set prevBtnState to high to always retrig envelopes
+          prevBtnState[index] = HIGH;
+          btnState[index] = LOW;
+          buttonUpdate(index);
+                  
+      }
+      else {  
+            btnState[index] = HIGH;
+            buttonUpdate(index);
+      }
     }
   }
 }
@@ -862,10 +869,9 @@ void loop() {
       voice8a.frequency((noteFreq[keyIndex][i]/4)*vcoOneOct);
       voice8b.frequency(((noteFreq[keyIndex][i]/4*vcoTwoOct) * deTune) * deTuneLfo);
     }
-
-    scanLEDs();
-    scanButtons();
-
+    
+    scan();
+   
     if(btnState[i] == LOW){
       if(i == 0){
         if(millis() - attackWait[i] > attackTime && noteTrigFlag[i]){
@@ -1104,10 +1110,37 @@ void loop() {
 //        mainOutMixer.gain(3,analogValues[i]/1023);
 //      }
       //pulseWidth
-      if(i == 1){
+      if(i == 16){
         tempPulseWidth = 1 - (analogValues[i]/1023);
         tempDetuneMod = analogValues[i]/2046;
 
+      }
+      //waveshape drive
+      if(i == 1){
+        pregain = analogValues[i]/1023*0.8 + 0,1;
+        Serial.println("pregain:");
+        Serial.println(pregain);
+        postgain = 1/pregain;
+        Serial.println("postgain:");
+        Serial.println(postgain);
+        
+        voice1gain.gain(pregain);
+        voice2gain.gain(pregain);
+        voice3gain.gain(pregain);
+        voice4gain.gain(pregain);
+        voice5gain.gain(pregain);
+        voice6gain.gain(pregain);
+        voice7gain.gain(pregain);
+        voice8gain.gain(pregain);
+
+        voice1postgain.gain(postgain);
+        voice2postgain.gain(postgain);
+        voice3postgain.gain(postgain);
+        voice4postgain.gain(postgain);
+        voice5postgain.gain(postgain);
+        voice6postgain.gain(postgain);
+        voice7postgain.gain(postgain);
+        voice8postgain.gain(postgain);
       }
       analogValuesLag[i] = analogValues[i];   
     }      
@@ -1199,10 +1232,8 @@ void loop() {
     voice6b.pulseWidth((tempPeak/2) + tempPulseWidth);
     voice7b.pulseWidth((tempPeak/2) + tempPulseWidth);
     voice8b.pulseWidth((tempPeak/2) + tempPulseWidth);
-
   }else{
     deTuneLfo = ((tempPeak) * tempDetuneMod + 1);
-    //Serial.println(deTuneLfo);
   }
 
   firstRunRead = false;
