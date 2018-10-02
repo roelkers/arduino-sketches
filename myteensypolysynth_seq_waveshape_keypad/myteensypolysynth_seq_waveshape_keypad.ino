@@ -4,6 +4,8 @@
 #include <SD.h>
 #include <SerialFlash.h>
 
+#include <Keypad.h>
+
 // GUItool: begin automatically generated code
 AudioSynthWaveformDc     lfoenvelope;    //xy=65.5,954.0000514984131
 AudioSynthWaveform       lfo;            //xy=153.5,1160.000051498413
@@ -228,13 +230,24 @@ AudioControlSGTL5000     sgtl5000_1;     //xy=2317.00390625,1054
 //config variables
 #define NUM_BTN_COLUMNS (4)
 #define NUM_BTN_ROWS (4)
+#define NUM_LED_COLUMNS (4)
+#define NUM_LED_ROWS (2)
 
-#define MAX_DEBOUNCE (3)
+byte btncolumnpins[NUM_BTN_COLUMNS] = {2, 3, 4, 5};
+byte btnrowpins[NUM_BTN_ROWS]       = {6, 7, 31,32};
 
-static const uint8_t btncolumnpins[NUM_BTN_COLUMNS] = {2, 3, 4, 5};
-static const uint8_t btnrowpins[NUM_BTN_ROWS]       = {6, 7, 31,32};
+char keys[NUM_BTN_ROWS][NUM_BTN_COLUMNS] = {
+    { 'a','b','c','d' },
+    { 'e','f','g','h' },
+    { '0','1','2','3' },
+    { '4','5','6','7' }
+};
 
-static int8_t debounce_count[NUM_BTN_COLUMNS][NUM_BTN_ROWS];
+static const uint8_t ledcolumnpins[NUM_LED_COLUMNS] = {23, 22, 21, 20}; //42,43,44,45 //LED GND 4,3,2,1
+static const uint8_t redpins[NUM_LED_ROWS]        = {17, 16}; //22,30,33,36 //Red 1,2,3,4
+static const uint8_t greenpins[NUM_LED_ROWS]        = {15, 14}; 
+
+Keypad keypad = Keypad( makeKeymap(keys), btnrowpins, btncolumnpins, NUM_BTN_ROWS, NUM_BTN_COLUMNS );
 
 int colorIndex;
 int keyIndex;
@@ -254,7 +267,6 @@ int steps[8][8];
 
 int btnState[16];
 int prevBtnState[16];
-
 
 //Analog Inputs
 float analogValues[16];
@@ -549,28 +561,92 @@ void setup() {
 
   uint8_t i;
 
-  // button columns
-  for (i = 0; i < NUM_BTN_COLUMNS; i++)
-  {
-    pinMode(btncolumnpins[i], OUTPUT);
+//  // LED column lines
+//  for(i = 0; i < NUM_LED_COLUMNS; i++)
+//  {
+//    pinMode(ledcolumnpins[i], OUTPUT);
+//
+//    // with nothing selected by default
+//    digitalWrite(ledcolumnpins[i], HIGH);
+//  }
+//
+//    // LED red row lines
+//  for(i = 0; i < NUM_LED_ROWS; i++)
+//  {
+//    pinMode(redpins[i], OUTPUT);
+//
+//    // with nothing driven by default
+//    digitalWrite(redpins[i], LOW);
+//  }
+//
+//  
+//  // LED green row lines
+//  for(i = 0; i < NUM_LED_ROWS; i++)
+//  {
+//    pinMode(greenpins[i], OUTPUT);
+//
+//    // with nothing driven by default
+//    digitalWrite(greenpins[i], LOW);
+//  }
 
-    // with nothing selected by default
-    digitalWrite(btncolumnpins[i], HIGH);
-  }
+}
 
-  // button row input lines
-  for (i = 0; i < NUM_BTN_ROWS; i++)
-  {
-    pinMode(btnrowpins[i], INPUT_PULLUP);
-  }
+static void scanLEDs()
+{
 
-  // Initialize the debounce counter array
-  for (uint8_t i = 0; i < NUM_BTN_COLUMNS; i++)
+  uint8_t val;
+  uint8_t i;
+  static uint8_t current;
+  uint8_t index = 0; 
+  
+  // Select a column
+  digitalWrite(ledcolumnpins[current], LOW);
+
+  // write the row pins
+  for(i = 0; i < NUM_LED_ROWS; i++)
   {
-    for (uint8_t j = 0; j < NUM_BTN_ROWS; j++)
-    {
-      debounce_count[i][j] = 0;
+    index = i*NUM_LED_COLUMNS+current;
+    //check if this is the activeStep
+    if(index == activeStep){
+  
+      //digitalWrite(redpins[i],HIGH);
+      
+//        Serial.println("active step");
+//        Serial.println(index);
+//        Serial.println("current");
+//        Serial.println(current);
+      
     }
+  //otherwise check if this step has a note
+  
+    else {
+      for(int j = 0; j < 8; j++){
+        if(steps[index][j] == 1)
+        {
+//                Serial.println("mark step");
+//                Serial.println(index);
+//                Serial.println(i);
+                //digitalWrite(greenpins[i], HIGH);
+        }
+      }
+    }
+  }
+
+  delay(1);
+
+  digitalWrite(ledcolumnpins[current], HIGH);
+
+  for(i = 0; i < NUM_LED_ROWS; i++)
+  {
+    digitalWrite(redpins[i], LOW);
+    digitalWrite(greenpins[i], LOW);
+  }
+
+  // Move on to the next column
+  current++;
+  if (current >= NUM_LED_COLUMNS)
+  {
+    current = 0;
   }
 
 }
@@ -588,8 +664,8 @@ int getSmooth(int pin){
 }
 
 void buttonUpdate(int i){
-//  Serial.println("buttonUpdate:");
-//  Serial.println(i);
+  Serial.println("buttonUpdate:");
+  Serial.println(i);
       if(i == 0){
         if (btnState[i] == LOW && prevBtnState[i] == HIGH){
           voice1env.amplitude(1,attackTime);
@@ -689,117 +765,66 @@ void buttonUpdate(int i){
       }
 }
 
-static void scan()
+void scanButtons()
 {
-  static uint8_t current = 0;
-  uint8_t val;
-  uint8_t i, j;
-  int index = 0;;
-  
-  for(int i = 0; i < NUM_BTN_COLUMNS; i++){
-    
-    // Select current columns
-    digitalWrite(btncolumnpins[i], LOW);
-    //digitalWrite(ledcolumnpins[current], LOW);
-  
-    // pause a moment
-    delay(1);
-  
-    // Read the button inputs
-    for ( j = 0; j < NUM_BTN_ROWS; j++)
+
+  String msg;
+  char key;
+  if (keypad.getKeys())
     {
-      index = j*NUM_BTN_COLUMNS+i;
-      
-      val = digitalRead(btnrowpins[j]);
-
-      //Serial.println(prevBtnState);
-      
-      if (val == LOW)
-      {
-        // active low: val is low when btn is pressed
-        if ( debounce_count[i][j] < MAX_DEBOUNCE)
+        for (int i=0; i<LIST_MAX; i++)   // Scan the whole key list.
         {
-          debounce_count[i][j]++;
-          if ( debounce_count[i][j] == MAX_DEBOUNCE )
-          {
-            
-            Serial.print("Key Down ");
-            Serial.println(index);
-            Serial.println("row:");
-            Serial.println(j);
-            Serial.println("column:");
-            Serial.println(i); 
-            
-//            Serial.println("btnState:");
-//            Serial.println(btnState);
-//            Serial.println("previous:");
-//            Serial.println(prevBtnState);
+            if ( keypad.key[i].stateChanged )   // Only find keys that have changed state.
+            {
+                key = keypad.key[i].kchar;
+                switch (keypad.key[i].kstate) {  // Report active key state : IDLE, PRESSED, HOLD, or RELEASED
+                    case PRESSED:
+                    msg = " PRESSED.";
+                    if (isdigit(key)){
+                      //convert to int
+                      int keyNum = key -'0';
+                      Serial.println("buttonUpdate");
+                      Serial.println(keyNum);
+                      buttonHeld[keyNum]= 1;  
+                      btnState[keyNum]=LOW;
+                      buttonUpdate(keyNum);
+                    }
+                    else{
+                      //convert letter to int
+                      int stepNum = key - 'a';
+                      //Serial.println("corresponding step");
+                      //Serial.println(stepNum);
+                      for(int k = 0; k< 8; k++){
+                        Serial.println(buttonHeld[k]);
+                        if(buttonHeld[k] == 1){
+                          Serial.println("sequencer input");
+                          Serial.println("at step");
+                          Serial.println(stepNum);
+                          steps[stepNum][k] = 1; 
+                        }
+                      }
+                    }
+                break;
+                    case RELEASED:
+                    msg = " RELEASED.";
 
-            if(j == 0 || j == 1){
-              for(int k = 0; k< 8; k++){
-                Serial.println(buttonHeld[k]);
-                if(buttonHeld[k]){
-                  Serial.println("sequencer input");
-                  Serial.println("button");
-                  Serial.println(k);
-                  Serial.println("at step");
-                  Serial.println(index);
-                  steps[index][k] = 1; 
-                }
-              }
+                    if (isdigit(key)){
+                      //convert to int
+                      int keyNum = key -'0';
+                      Serial.println("buttonUpdate");
+                      Serial.println(keyNum);
+                      buttonHeld[keyNum] = 0;
+                      btnState[keyNum]= HIGH;
+                      buttonUpdate(keyNum);
+                    }
+                break;
+                    }
+                Serial.print("Key ");
+                Serial.print(key);
+                Serial.println(msg);
             }
-            else{
-              index = index%8;
-              Serial.println("note triggered");
-              Serial.println(index);
-              buttonHeld[index]= 1;  
-              
-              btnState[index] = LOW;
-            
-              buttonUpdate(index);
-
-            
-            }
-          }
         }
-      }
-      else
-      {
-        // otherwise, button is released
-        if ( debounce_count[i][j] > 0)
-        {
-          debounce_count[i][j]--;
-          if ( debounce_count[i][j] == 0 )
-          {
-            Serial.print("Key Up ");
-            Serial.println(index);
-            Serial.println("row:");
-            Serial.println(j);
-            Serial.println("column:");
-            Serial.println(i); 
-
-            if(j== 2 || j == 3){
-              index = index%8;
-              
-              Serial.println("note released");
-              Serial.println(index);
-              
-              buttonHeld[index] = 0;
-              
-              btnState[index] = HIGH;
-
-              buttonUpdate(index);
-            }
-          }
-        }
-      } 
-    }// for j = 0 to 3;
-
-    delay(1);
-  
-    digitalWrite(btncolumnpins[i], HIGH);
-
-  }
+    }
 }  
 
 void advanceSequencer(){
@@ -819,7 +844,7 @@ void advanceSequencer(){
       }
       else {  
             btnState[index] = HIGH;
-            buttonUpdate(index);
+            //buttonUpdate(index);
       }
     }
   }
@@ -870,8 +895,9 @@ void loop() {
       voice8b.frequency(((noteFreq[keyIndex][i]/4*vcoTwoOct) * deTune) * deTuneLfo);
     }
     
-    scan();
-   
+    scanButtons();
+    //scanLEDs();
+    
     if(btnState[i] == LOW){
       if(i == 0){
         if(millis() - attackWait[i] > attackTime && noteTrigFlag[i]){
@@ -1118,11 +1144,11 @@ void loop() {
       //waveshape drive
       if(i == 1){
         pregain = analogValues[i]/1023*0.8 + 0,1;
-        Serial.println("pregain:");
-        Serial.println(pregain);
+        //Serial.println("pregain:");
+        //Serial.println(pregain);
         postgain = 1/pregain;
-        Serial.println("postgain:");
-        Serial.println(postgain);
+        //Serial.println("postgain:");
+        //Serial.println(postgain);
         
         voice1gain.gain(pregain);
         voice2gain.gain(pregain);

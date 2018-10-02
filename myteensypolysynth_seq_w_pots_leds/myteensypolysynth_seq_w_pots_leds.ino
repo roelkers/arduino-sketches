@@ -5,6 +5,7 @@
 #include <SerialFlash.h>
 
 #include <Keypad.h>
+#include <ctype.h>
 
 // GUItool: begin automatically generated code
 AudioSynthWaveformDc     lfoenvelope;    //xy=393.28997802734375,967.1499862670898
@@ -206,8 +207,8 @@ byte btnrowpins[NUM_BTN_ROWS]       = {6, 7, 31,32};
 char keys[NUM_BTN_ROWS][NUM_BTN_COLUMNS] = {
     { 'a','b','c','d' },
     { 'e','f','g','h' },
-    { '1','2','3','4' },
-    { '5','6','7','8' }
+    { '0','1','2','3' },
+    { '4','5','6','7' }
 };
 
 static const uint8_t ledcolumnpins[NUM_LED_COLUMNS] = {23, 22, 21, 20}; //42,43,44,45 //LED GND 4,3,2,1
@@ -465,12 +466,12 @@ void setup() {
 
   attackTimeFilter = 0;
   decayTimeFilter = 0;
-  sustainLevelFilter = 1;
+  sustainLevelFilter = 0;
   releaseTimeFilter = 500;
 
   attackTime = 0;
   decayTime = 250;
-  sustainLevel= 1;
+  sustainLevel= 0;
   releaseTime= 500;
 
   //Sequencer
@@ -478,14 +479,14 @@ void setup() {
   stepWait = 0;
   activeStep = 0;
 
-  steps[0][4] = 1;
-  steps[1][3] = 1;
-  steps[2][1] = 1;
-  steps[3][5] = 1;
-  steps[4][0] = 1;
-  steps[5][3] = 1;
-  steps[6][3] = 1;
-  steps[7][4] = 1;
+//  steps[0][4] = 1;
+//  steps[1][3] = 1;
+//  steps[2][1] = 1;
+//  steps[3][5] = 1;
+//  steps[4][0] = 1;
+//  steps[5][3] = 1;
+//  steps[6][3] = 1;
+//  steps[7][4] = 1;
 
   firstRunRead = true;
 
@@ -540,7 +541,7 @@ static void scanLEDs()
     //check if this is the activeStep
     if(index == activeStep){
   
-      digitalWrite(redpins[i],HIGH);
+      //digitalWrite(redpins[i],HIGH);
       
 //        Serial.println("active step");
 //        Serial.println(index);
@@ -557,7 +558,7 @@ static void scanLEDs()
 //                Serial.println("mark step");
 //                Serial.println(index);
 //                Serial.println(i);
-                digitalWrite(greenpins[i], HIGH);
+                //digitalWrite(greenpins[i], HIGH);
         }
       }
     }
@@ -700,99 +701,58 @@ static void scanButtons()
 {
 
   String msg;
-  
+  char key;
   if (keypad.getKeys())
     {
         for (int i=0; i<LIST_MAX; i++)   // Scan the whole key list.
         {
             if ( keypad.key[i].stateChanged )   // Only find keys that have changed state.
             {
+                key = keypad.key[i].kchar;
                 switch (keypad.key[i].kstate) {  // Report active key state : IDLE, PRESSED, HOLD, or RELEASED
                     case PRESSED:
                     msg = " PRESSED.";
-                break;
-                    case HOLD:
-                    msg = " HOLD.";
+                    if (isdigit(key)){
+                      //convert to int
+                      int keyNum = key -'0';
+                      buttonHeld[keyNum]= 1;  
+                      btnState[keyNum]=LOW;
+                      buttonUpdate(keyNum);
+                    }
+                    else{
+                      //convert letter to int
+                      int stepNum = key - 'a';
+                      //Serial.println("corresponding step");
+                      //Serial.println(stepNum);
+                      for(int k = 0; k< 8; k++){
+                        Serial.println(buttonHeld[k]);
+                        if(buttonHeld[k] == 1){
+                          Serial.println("sequencer input");
+                          Serial.println("at step");
+                          Serial.println(stepNum);
+                          steps[stepNum][k] = 1; 
+                        }
+                      }
+                    }
                 break;
                     case RELEASED:
                     msg = " RELEASED.";
+
+                    if (isdigit(key)){
+                      //convert to int
+                      int keyNum = keyNum -'0';
+                      buttonHeld[keyNum] = 0;
+                      btnState[keyNum]=LOW;
+                      buttonUpdate(keyNum);
+                    }
                 break;
-                    case IDLE:
-                    msg = " IDLE.";
-                }
+                    }
                 Serial.print("Key ");
-                Serial.print(keypad.key[i].kchar);
+                Serial.print(key);
                 Serial.println(msg);
             }
         }
     }
-//            
-//            Serial.print("Key Down ");
-//            Serial.println(index);
-//            Serial.println("row:");
-//            Serial.println(j);
-//            Serial.println("column:");
-//            Serial.println(i); 
-//            
-////            Serial.println("btnState:");
-////            Serial.println(btnState);
-////            Serial.println("previous:");
-////            Serial.println(prevBtnState);
-//
-//            if(j == 0 || j == 1){
-//              for(int k = 0; k< 8; k++){
-//                Serial.println(buttonHeld[k]);
-//                if(buttonHeld[k]){
-//                  Serial.println("sequencer input");
-//                  Serial.println("button");
-//                  Serial.println(k);
-//                  Serial.println("at step");
-//                  Serial.println(index);
-//                  steps[index][k] = 1; 
-//                }
-//              }
-//            }
-//            else{
-//              index = index%8;
-//              Serial.println("note triggered");
-//              Serial.println(index);
-//              buttonHeld[index]= 1;  
-//              
-//              btnState[index] = LOW;
-//            
-//              buttonUpdate(index);
-//
-//            
-//            }
-//          }
-//        }
-//      }
-//      else
-//      {
-//        // otherwise, button is released
-//        if ( debounce_count[i][j] > 0)
-//        {
-//          debounce_count[i][j]--;
-//          if ( debounce_count[i][j] == 0 )
-//          {
-//            Serial.print("Key Up ");
-//            Serial.println(index);
-//            Serial.println("row:");
-//            Serial.println(j);
-//            Serial.println("column:");
-//            Serial.println(i); 
-//
-//            if(j== 2 || j == 3){
-//              index = index%8;
-//              
-//              Serial.println("note released");
-//              Serial.println(index);
-//              
-//              buttonHeld[index] = 0;
-//              
-//              btnState[index] = HIGH;
-//
-//              buttonUpdate(index);
 }  
 
 void advanceSequencer(){
@@ -800,9 +760,9 @@ void advanceSequencer(){
   for(int index = 0; index< 8; index++){ 
     if(steps[activeStep][index]){
       
-//      Serial.println("note triggered");
-//      Serial.println("activeStep");
-//      Serial.println(activeStep);
+      Serial.println("note triggered");
+      Serial.println("activeStep");
+      Serial.println(activeStep);
 
       //set prevBtnState to high to always retrig envelopes
       prevBtnState[index] = HIGH;
